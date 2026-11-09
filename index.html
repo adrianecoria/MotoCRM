@@ -1122,80 +1122,43 @@ tbody tr:hover { background: var(--bg-hover); }
 
     <!-- ═══ CRM UNIFICADO ═══ -->
     <div class="view" id="view-crm">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-        <div class="tabs">
-          <button class="tab-btn active">Todos</button>
-          <button class="tab-btn">Alquiler</button>
-          <button class="tab-btn">Compra</button>
-          <button class="tab-btn">GPS</button>
-        </div>
-        <button class="btn btn-primary" onclick="openModal('modalCliente')">+ Nuevo Cliente</button>
+      <!-- Sub-tabs CRM -->
+      <div class="tabs" style="margin-bottom:20px">
+        <button class="tab-btn active" onclick="switchCrmTab('clientes')">Clientes</button>
+        <button class="tab-btn" onclick="switchCrmTab('motos')">Motovehículos</button>
       </div>
-      <div class="card" style="padding:0">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>DNI / CUIT</th><th>Nombre Completo</th><th>Teléfono</th><th>Scoring</th><th>Sectores</th><th>Estado</th><th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="font-variant-numeric:tabular-nums">32.456.789</td>
-                <td><strong>Rodríguez, Martín</strong></td>
-                <td>+54 11 4567-8901</td>
-                <td><span class="pill red">● 320</span></td>
-                <td><span class="pill purple">Alquiler</span> <span class="pill blue">GPS</span></td>
-                <td><span class="pill red">En mora</span></td>
-                <td><button class="btn btn-secondary btn-sm">Ver ficha</button></td>
-              </tr>
-              <tr>
-                <td style="font-variant-numeric:tabular-nums">28.901.234</td>
-                <td><strong>González, María Laura</strong></td>
-                <td>+54 11 5678-2345</td>
-                <td><span class="pill green">● 780</span></td>
-                <td><span class="pill purple">Alquiler</span> <span class="pill blue">GPS</span></td>
-                <td><span class="pill green">Al día</span></td>
-                <td><button class="btn btn-secondary btn-sm">Ver ficha</button></td>
-              </tr>
-              <tr>
-                <td style="font-variant-numeric:tabular-nums">35.678.012</td>
-                <td><strong>Fernández, Lucas</strong></td>
-                <td>+54 11 6789-3456</td>
-                <td><span class="pill green">● 850</span></td>
-                <td><span class="pill blue" style="background:rgba(59,130,246,0.12)">Compra</span> <span class="pill blue">GPS</span></td>
-                <td><span class="pill green">Al día</span></td>
-                <td><button class="btn btn-secondary btn-sm">Ver ficha</button></td>
-              </tr>
-              <tr>
-                <td style="font-variant-numeric:tabular-nums">40.123.456</td>
-                <td><strong>Díaz, Valentina</strong></td>
-                <td>+54 11 3456-7890</td>
-                <td><span class="pill yellow">● 520</span></td>
-                <td><span class="pill purple">Alquiler</span></td>
-                <td><span class="pill yellow">Riesgo medio</span></td>
-                <td><button class="btn btn-secondary btn-sm">Ver ficha</button></td>
-              </tr>
-              <tr>
-                <td style="font-variant-numeric:tabular-nums">27.890.567</td>
-                <td><strong>López, Santiago</strong></td>
-                <td>+54 11 7890-1234</td>
-                <td><span class="pill green">● 910</span></td>
-                <td><span class="pill blue" style="background:rgba(59,130,246,0.12)">Compra</span></td>
-                <td><span class="pill green">Al día</span></td>
-                <td><button class="btn btn-secondary btn-sm">Ver ficha</button></td>
-              </tr>
-              <tr>
-                <td style="font-variant-numeric:tabular-nums">33.456.123</td>
-                <td><strong>Martínez, Camila</strong></td>
-                <td>+54 11 2345-6789</td>
-                <td><span class="pill green">● 720</span></td>
-                <td><span class="pill blue">GPS</span></td>
-                <td><span class="pill green">Al día</span></td>
-                <td><button class="btn btn-secondary btn-sm">Ver ficha</button></td>
-              </tr>
-            </tbody>
-          </table>
+
+      <!-- ── CLIENTES ── -->
+      <div id="crmTab-clientes" class="config-tab active">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+          <div style="font-size:13px;color:var(--text-secondary)" id="clienteCount">Cargando...</div>
+          <button class="btn btn-primary" onclick="openModal('modalCliente'); resetClienteForm();">+ Nuevo Cliente</button>
+        </div>
+        <div id="clienteListLoading" style="text-align:center;padding:40px;color:var(--text-secondary)">Cargando clientes...</div>
+        <div id="clienteTableWrap" class="card" style="padding:0;display:none">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>DNI</th><th>Nombre Completo</th><th>Teléfono</th><th>Email</th><th>Sectores</th><th>Acciones</th></tr></thead>
+              <tbody id="clienteTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MOTOVEHÍCULOS ── -->
+      <div id="crmTab-motos" class="config-tab">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+          <div style="font-size:13px;color:var(--text-secondary)" id="motoCount">Cargando...</div>
+          <button class="btn btn-primary" onclick="openModal('modalMoto'); resetMotoForm();">+ Nuevo Motovehículo</button>
+        </div>
+        <div id="motoListLoading" style="text-align:center;padding:40px;color:var(--text-secondary)">Cargando motovehículos...</div>
+        <div id="motoTableWrap" class="card" style="padding:0;display:none">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Patente</th><th>Marca / Modelo</th><th>Cilindrada</th><th>Color</th><th>Estado</th><th>Sector</th><th>Acciones</th></tr></thead>
+              <tbody id="motoTableBody"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -1290,25 +1253,19 @@ tbody tr:hover { background: var(--bg-hover); }
     <div class="view" id="view-s1-contratos">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
         <div class="tabs">
-          <button class="tab-btn active">Activos</button>
-          <button class="tab-btn">Finalizados</button>
-          <button class="tab-btn">En mora</button>
-          <button class="tab-btn">Opción compra</button>
+          <button class="tab-btn active" onclick="cargarContratos(null, this)">Todos</button>
+          <button class="tab-btn" onclick="cargarContratos('activo', this)">Activos</button>
+          <button class="tab-btn" onclick="cargarContratos('mora', this)">En mora</button>
+          <button class="tab-btn" onclick="cargarContratos('finalizado', this)">Finalizados</button>
         </div>
-        <button class="btn btn-primary" onclick="openModal('modalContrato')">+ Nuevo Contrato</button>
+        <button class="btn btn-primary" onclick="abrirNuevoContrato()">+ Nuevo Contrato</button>
       </div>
-      <div class="card" style="padding:0">
+      <div id="contratoListLoading" style="text-align:center;padding:40px;color:var(--text-secondary)">Cargando contratos...</div>
+      <div id="contratoTableWrap" class="card" style="padding:0;display:none">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>#</th><th>Cliente</th><th>Unidad</th><th>Inicio</th><th>Plazo</th><th>Cuota</th><th>Cuotas Pagas</th><th>Estado</th><th>Residual</th></tr></thead>
-            <tbody>
-              <tr><td>A-0756</td><td>González, M.L.</td><td>Honda Wave 110</td><td>01/02/2025</td><td>12 meses</td><td style="font-variant-numeric:tabular-nums">$32.000</td><td>10/12</td><td><span class="pill green">Al día</span></td><td style="font-variant-numeric:tabular-nums">$180.000</td></tr>
-              <tr><td>A-0892</td><td>Rodríguez, M.</td><td>Honda CB190R</td><td>15/04/2025</td><td>24 meses</td><td style="font-variant-numeric:tabular-nums">$45.000</td><td>5/24</td><td><span class="pill red">Mora 45d</span></td><td style="font-variant-numeric:tabular-nums">$450.000</td></tr>
-              <tr><td>A-0934</td><td>Torres, Facundo</td><td>Yamaha FZ25</td><td>01/06/2025</td><td>18 meses</td><td style="font-variant-numeric:tabular-nums">$58.000</td><td>5/18</td><td><span class="pill green">Al día</span></td><td style="font-variant-numeric:tabular-nums">$520.000</td></tr>
-              <tr><td>A-1023</td><td>Pérez, Juan</td><td>Bajaj Dominar 250</td><td>01/08/2025</td><td>18 meses</td><td style="font-variant-numeric:tabular-nums">$52.000</td><td>2/18</td><td><span class="pill yellow">Mora 8d</span></td><td style="font-variant-numeric:tabular-nums">$580.000</td></tr>
-              <tr><td>A-1105</td><td>Ramírez, Sol</td><td>TVS Apache 200</td><td>15/09/2025</td><td>12 meses</td><td style="font-variant-numeric:tabular-nums">$38.000</td><td>1/12</td><td><span class="pill yellow">Mora 3d</span></td><td style="font-variant-numeric:tabular-nums">$290.000</td></tr>
-              <tr><td>A-1148</td><td>Acosta, Lara</td><td>Zanella ZR 200</td><td>01/10/2025</td><td>24 meses</td><td style="font-variant-numeric:tabular-nums">$35.000</td><td>1/24</td><td><span class="pill green">Al día</span></td><td style="font-variant-numeric:tabular-nums">$380.000</td></tr>
-            </tbody>
+            <thead><tr><th>#</th><th>Cliente</th><th>Unidad</th><th>Inicio</th><th>Plazo</th><th>Cuota</th><th>Meses Restantes</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="contratoTableBody"></tbody>
           </table>
         </div>
       </div>
@@ -1429,69 +1386,24 @@ tbody tr:hover { background: var(--bg-hover); }
 
     <!-- ═══ SECTOR 2: INVENTARIO ═══ -->
     <div class="view" id="view-s2-stock">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-        <div class="tabs">
-          <button class="tab-btn active">Todos (84)</button>
-          <button class="tab-btn">En salón (42)</button>
-          <button class="tab-btn">Reservadas (12)</button>
-          <button class="tab-btn">En trámite (8)</button>
-        </div>
-        <button class="btn btn-primary">+ Cargar Unidad</button>
+      <div class="tabs" style="margin-bottom:20px">
+        <button class="tab-btn active" onclick="switchInventarioTab('alquiler')">En Alquiler</button>
+        <button class="tab-btn" onclick="switchInventarioTab('deposito')">En Depósito</button>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">
-        <div class="moto-card">
-          <div class="moto-img">🏍️<div class="moto-status"><span class="pill green">En salón</span></div></div>
-          <div class="moto-body">
-            <div class="moto-brand">Honda</div>
-            <div class="moto-name">Wave 110 S</div>
-            <div class="moto-specs"><span>110cc</span><span>0 km</span><span>Negra</span></div>
-            <div class="moto-price">$1.850.000<span class="moto-cost">Costo: $1.520.000</span></div>
-          </div>
+
+      <!-- ── EN ALQUILER ── -->
+      <div id="invTab-alquiler" class="config-tab active">
+        <div id="invAlquilerLoading" style="text-align:center;padding:40px;color:var(--text-secondary)">Cargando motos en alquiler...</div>
+        <div id="invAlquilerWrap" style="display:none">
+          <div id="invAlquilerCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px"></div>
         </div>
-        <div class="moto-card">
-          <div class="moto-img">🏍️<div class="moto-status"><span class="pill green">En salón</span></div></div>
-          <div class="moto-body">
-            <div class="moto-brand">Bajaj</div>
-            <div class="moto-name">Dominar 250</div>
-            <div class="moto-specs"><span>250cc</span><span>0 km</span><span>Blanca</span></div>
-            <div class="moto-price">$3.450.000<span class="moto-cost">Costo: $2.890.000</span></div>
-          </div>
-        </div>
-        <div class="moto-card">
-          <div class="moto-img">🏍️<div class="moto-status"><span class="pill blue">Reservada</span></div></div>
-          <div class="moto-body">
-            <div class="moto-brand">Yamaha</div>
-            <div class="moto-name">FZ 25</div>
-            <div class="moto-specs"><span>250cc</span><span>0 km</span><span>Azul</span></div>
-            <div class="moto-price">$4.200.000<span class="moto-cost">Costo: $3.560.000</span></div>
-          </div>
-        </div>
-        <div class="moto-card">
-          <div class="moto-img">🏍️<div class="moto-status"><span class="pill yellow">En trámite</span></div></div>
-          <div class="moto-body">
-            <div class="moto-brand">Honda</div>
-            <div class="moto-name">CB 190R</div>
-            <div class="moto-specs"><span>190cc</span><span>0 km</span><span>Roja</span></div>
-            <div class="moto-price">$3.100.000<span class="moto-cost">Costo: $2.580.000</span></div>
-          </div>
-        </div>
-        <div class="moto-card">
-          <div class="moto-img">🏍️<div class="moto-status"><span class="pill green">En salón</span></div></div>
-          <div class="moto-body">
-            <div class="moto-brand">TVS</div>
-            <div class="moto-name">Apache RTR 200</div>
-            <div class="moto-specs"><span>200cc</span><span>0 km</span><span>Negra</span></div>
-            <div class="moto-price">$2.780.000<span class="moto-cost">Costo: $2.290.000</span></div>
-          </div>
-        </div>
-        <div class="moto-card">
-          <div class="moto-img">🏍️<div class="moto-status"><span class="pill green">En salón</span></div></div>
-          <div class="moto-body">
-            <div class="moto-brand">Zanella</div>
-            <div class="moto-name">ZR 200 OHC</div>
-            <div class="moto-specs"><span>200cc</span><span>0 km</span><span>Gris</span></div>
-            <div class="moto-price">$1.950.000<span class="moto-cost">Costo: $1.610.000</span></div>
-          </div>
+      </div>
+
+      <!-- ── EN DEPÓSITO ── -->
+      <div id="invTab-deposito" class="config-tab">
+        <div id="invDepositoLoading" style="text-align:center;padding:40px;color:var(--text-secondary)">Cargando motos en depósito...</div>
+        <div id="invDepositoWrap" style="display:none">
+          <div id="invDepositoCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px"></div>
         </div>
       </div>
     </div>
@@ -1856,57 +1768,6 @@ tbody tr:hover { background: var(--bg-hover); }
 
 </div><!-- /app-container -->
 
-<!-- ═══ MODAL: NUEVO CLIENTE ═══ -->
-<div class="modal-overlay" id="modalCliente" hidden>
-  <div class="modal">
-    <div class="modal-header"><h2>Nuevo Cliente</h2><button class="modal-close" onclick="closeModal('modalCliente')">✕</button></div>
-    <div class="modal-body">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="form-group"><label class="form-label">DNI</label><input class="form-input" placeholder="32456789" id="newDni"></div>
-        <div class="form-group"><label class="form-label">CUIT</label><input class="form-input" placeholder="20-32456789-4"></div>
-        <div class="form-group"><label class="form-label">Apellido</label><input class="form-input" placeholder="Rodríguez"></div>
-        <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" placeholder="Martín"></div>
-        <div class="form-group"><label class="form-label">Teléfono</label><input class="form-input" placeholder="+54 11 4567-8901"></div>
-        <div class="form-group"><label class="form-label">Email</label><input class="form-input" placeholder="correo@ejemplo.com"></div>
-        <div class="form-group" style="grid-column:span 2"><label class="form-label">Domicilio</label><input class="form-input" placeholder="Av. Corrientes 1234, CABA"></div>
-      </div>
-      <div class="form-group"><label class="form-label">Sectores a vincular</label>
-        <div style="display:flex;gap:12px;margin-top:6px">
-          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox"> Alquiler</label>
-          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox"> Venta</label>
-          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox"> GPS</label>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalCliente')">Cancelar</button><button class="btn btn-primary">Guardar Cliente</button></div>
-  </div>
-</div>
-
-<!-- ═══ MODAL: NUEVO CONTRATO ═══ -->
-<div class="modal-overlay" id="modalContrato" hidden>
-  <div class="modal">
-    <div class="modal-header"><h2>Nuevo Contrato de Alquiler</h2><button class="modal-close" onclick="closeModal('modalContrato')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-group"><label class="form-label">Cliente (DNI o nombre)</label><input class="form-input" placeholder="Buscar cliente..."></div>
-      <div class="form-group"><label class="form-label">Unidad a asignar</label>
-        <select class="form-select"><option>Seleccionar unidad del stock...</option><option>Honda Wave 110 S — AB123CD</option><option>Bajaj Dominar 250 — CD456EF</option><option>TVS Apache 200 — GH789IJ</option></select>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="form-group"><label class="form-label">Plazo (meses)</label><select class="form-select"><option>6</option><option selected>12</option><option>18</option><option>24</option></select></div>
-        <div class="form-group"><label class="form-label">Valor cuota mensual ($)</label><input class="form-input" placeholder="45.000"></div>
-        <div class="form-group"><label class="form-label">Anticipo ($)</label><input class="form-input" placeholder="100.000"></div>
-        <div class="form-group"><label class="form-label">Valor residual / Opción compra ($)</label><input class="form-input" placeholder="350.000"></div>
-      </div>
-      <div class="form-group">
-        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-top:8px">
-          <input type="checkbox" checked> Vincular dispositivo GPS automáticamente
-        </label>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalContrato')">Cancelar</button><button class="btn btn-primary">Crear Contrato</button></div>
-  </div>
-</div>
-
 <!-- ═══ MODAL: NUEVO/EDITAR USUARIO ═══ -->
 <div class="modal-overlay" id="modalUsuario" hidden>
   <div class="modal" style="max-width:520px">
@@ -1936,6 +1797,111 @@ tbody tr:hover { background: var(--bg-hover); }
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modalUsuario')">Cancelar</button>
       <button class="btn btn-primary" id="btnGuardarUsuario" onclick="guardarUsuario()">Crear Usuario</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL CLIENTE ═══ -->
+<div class="modal-overlay" id="modalCliente" hidden>
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header"><h2 id="modalClienteTitle">Nuevo Cliente</h2><button class="modal-close" onclick="closeModal('modalCliente')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editClienteId">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group"><label class="form-label">DNI *</label><input class="form-input" id="cDni" placeholder="12345678"></div>
+        <div class="form-group"><label class="form-label">CUIT</label><input class="form-input" id="cCuit" placeholder="20-12345678-9"></div>
+        <div class="form-group"><label class="form-label">Nombre *</label><input class="form-input" id="cNombre" placeholder="Nombre"></div>
+        <div class="form-group"><label class="form-label">Apellido *</label><input class="form-input" id="cApellido" placeholder="Apellido"></div>
+        <div class="form-group"><label class="form-label">Teléfono</label><input class="form-input" id="cTelefono" placeholder="+54 11 ..."></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="cEmail" type="email" placeholder="email@ejemplo.com"></div>
+        <div class="form-group" style="grid-column:1/-1"><label class="form-label">Domicilio</label><input class="form-input" id="cDomicilio" placeholder="Calle y número"></div>
+        <div class="form-group"><label class="form-label">Localidad</label><input class="form-input" id="cLocalidad" placeholder="Localidad"></div>
+        <div class="form-group"><label class="form-label">Provincia</label><input class="form-input" id="cProvincia" value="Buenos Aires"></div>
+      </div>
+      <div style="margin-top:12px;font-size:13px;font-weight:600;color:var(--text-secondary)">Sectores</div>
+      <div style="display:flex;gap:16px;margin-top:8px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="cSectorAlquiler"> Alquiler</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="cSectorVentas"> Ventas</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="cSectorGps"> GPS</label>
+      </div>
+      <div class="form-group" style="margin-top:12px"><label class="form-label">Notas</label><textarea class="form-input" id="cNotas" rows="2" placeholder="Observaciones..."></textarea></div>
+      <div id="clienteFormError" class="login-error" style="margin-top:12px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalCliente')">Cancelar</button>
+      <button class="btn btn-primary" id="btnGuardarCliente" onclick="guardarCliente()">Crear Cliente</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL MOTOVEHÍCULO ═══ -->
+<div class="modal-overlay" id="modalMoto" hidden>
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header"><h2 id="modalMotoTitle">Nuevo Motovehículo</h2><button class="modal-close" onclick="closeModal('modalMoto')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editMotoId">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group"><label class="form-label">Marca *</label><input class="form-input" id="mMarca" placeholder="Honda, Yamaha..."></div>
+        <div class="form-group"><label class="form-label">Modelo *</label><input class="form-input" id="mModelo" placeholder="Wave 110, FZ25..."></div>
+        <div class="form-group"><label class="form-label">Cilindrada</label><input class="form-input" id="mCilindrada" placeholder="110cc"></div>
+        <div class="form-group"><label class="form-label">Año</label><input class="form-input" id="mAnio" type="number" placeholder="2026"></div>
+        <div class="form-group"><label class="form-label">Color</label><input class="form-input" id="mColor" placeholder="Negro, Rojo..."></div>
+        <div class="form-group"><label class="form-label">Patente</label><input class="form-input" id="mPatente" placeholder="AB 123 CD" style="text-transform:uppercase"></div>
+        <div class="form-group"><label class="form-label">N° Motor</label><input class="form-input" id="mMotor" placeholder="Número de motor"></div>
+        <div class="form-group"><label class="form-label">N° Cuadro</label><input class="form-input" id="mCuadro" placeholder="Número de cuadro"></div>
+        <div class="form-group"><label class="form-label">Kilometraje</label><input class="form-input" id="mKm" type="number" value="0"></div>
+        <div class="form-group"><label class="form-label">Estado</label>
+          <select class="form-input" id="mEstado">
+            <option value="en_salon">En salón</option><option value="reservada">Reservada</option>
+            <option value="en_tramite">En trámite</option><option value="alquilada">Alquilada</option>
+            <option value="en_taller">En taller</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Precio Compra</label><input class="form-input" id="mPrecioCompra" type="number" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Precio Venta</label><input class="form-input" id="mPrecioVenta" type="number" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Alquiler Mensual</label><input class="form-input" id="mPrecioAlquiler" type="number" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Sector</label>
+          <select class="form-input" id="mSector">
+            <option value="alquiler">Alquiler</option><option value="venta">Venta</option><option value="ambos">Ambos</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:12px"><label class="form-label">Notas</label><textarea class="form-input" id="mNotas" rows="2" placeholder="Observaciones..."></textarea></div>
+      <div id="motoFormError" class="login-error" style="margin-top:12px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalMoto')">Cancelar</button>
+      <button class="btn btn-primary" id="btnGuardarMoto" onclick="guardarMoto()">Crear Motovehículo</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL CONTRATO ═══ -->
+<div class="modal-overlay" id="modalContrato" hidden>
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header"><h2>Nuevo Contrato de Alquiler</h2><button class="modal-close" onclick="closeModal('modalContrato')">✕</button></div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group" style="grid-column:1/-1"><label class="form-label">Cliente *</label>
+          <select class="form-input" id="ctCliente"><option value="">Seleccionar cliente...</option></select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1"><label class="form-label">Motovehículo * (solo disponibles)</label>
+          <select class="form-input" id="ctMoto"><option value="">Seleccionar moto...</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Fecha Inicio *</label><input class="form-input" id="ctFechaInicio" type="date"></div>
+        <div class="form-group"><label class="form-label">Plazo (meses) *</label><input class="form-input" id="ctPlazo" type="number" value="10" min="1" max="10"></div>
+        <div class="form-group"><label class="form-label">Valor del Activo</label><input class="form-input" id="ctValorActivo" type="number" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Anticipo</label><input class="form-input" id="ctAnticipo" type="number" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Cant. Cuotas</label><input class="form-input" id="ctCuotas" type="number" value="10" min="1"></div>
+        <div class="form-group"><label class="form-label">Valor Cuota *</label><input class="form-input" id="ctValorCuota" type="number" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Opción a Compra</label><input class="form-input" id="ctOpcionCompra" type="number" placeholder="0"></div>
+      </div>
+      <div class="form-group" style="margin-top:12px"><label class="form-label">Notas</label><textarea class="form-input" id="ctNotas" rows="2" placeholder="Observaciones del contrato..."></textarea></div>
+      <div id="contratoFormError" class="login-error" style="margin-top:12px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalContrato')">Cancelar</button>
+      <button class="btn btn-primary" id="btnGuardarContrato" onclick="guardarContrato()">Crear Contrato</button>
     </div>
   </div>
 </div>
@@ -2196,6 +2162,436 @@ async function toggleUsuario(id, activo) {
     if (result && result.ok) { showToast(activo ? 'Usuario desactivado' : 'Usuario reactivado'); cargarUsuarios(); }
     else showToast((result && result.error) || 'Error', 'error');
   } catch (err) { showToast('Error de conexión', 'error'); }
+}
+
+// ═══ CRM: CLIENTES ═══
+function switchCrmTab(tab) {
+  document.querySelectorAll('#view-crm .config-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('crmTab-' + tab)?.classList.add('active');
+  document.querySelectorAll('#view-crm > .tabs .tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', ['clientes','motos'][i] === tab);
+  });
+  if (tab === 'clientes') cargarClientes();
+  if (tab === 'motos') cargarMotos();
+}
+
+async function cargarClientes() {
+  const loading = document.getElementById('clienteListLoading');
+  const wrap = document.getElementById('clienteTableWrap');
+  const tbody = document.getElementById('clienteTableBody');
+  loading.style.display = 'block'; wrap.style.display = 'none';
+  try {
+    const data = await rpc('fn_listar_clientes');
+    tbody.innerHTML = '';
+    if (data && data.length) {
+      document.getElementById('clienteCount').textContent = data.length + ' clientes activos';
+      data.forEach(c => {
+        const sectores = [];
+        if (c.sector_alquiler) sectores.push('<span class="pill purple">Alquiler</span>');
+        if (c.sector_ventas) sectores.push('<span class="pill blue">Ventas</span>');
+        if (c.sector_gps) sectores.push('<span class="pill green">GPS</span>');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-variant-numeric:tabular-nums">${esc(c.dni)}</td>
+          <td><strong>${esc(c.apellido)}, ${esc(c.nombre)}</strong></td>
+          <td>${esc(c.telefono || '—')}</td>
+          <td style="font-size:12px">${esc(c.email || '—')}</td>
+          <td>${sectores.join(' ') || '—'}</td>
+          <td>
+            <div class="user-actions-cell">
+              <button onclick='editarCliente(${JSON.stringify(c).replace(/'/g,"&#39;")})' title="Editar">✏️</button>
+              <button class="btn-danger" onclick="eliminarCliente('${c.id}')" title="Desactivar">🚫</button>
+            </div>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    } else {
+      document.getElementById('clienteCount').textContent = '0 clientes';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-secondary);padding:24px">No hay clientes registrados</td></tr>';
+    }
+    loading.style.display = 'none'; wrap.style.display = 'block';
+  } catch (err) { loading.textContent = 'Error: ' + err.message; }
+}
+
+function resetClienteForm() {
+  ['editClienteId','cDni','cCuit','cNombre','cApellido','cTelefono','cEmail','cDomicilio','cLocalidad','cNotas'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('cProvincia').value = 'Buenos Aires';
+  document.getElementById('cDni').disabled = false;
+  ['cSectorAlquiler','cSectorVentas','cSectorGps'].forEach(id => document.getElementById(id).checked = false);
+  document.getElementById('clienteFormError').style.display = 'none';
+  document.getElementById('modalClienteTitle').textContent = 'Nuevo Cliente';
+  document.getElementById('btnGuardarCliente').textContent = 'Crear Cliente';
+}
+
+function editarCliente(c) {
+  document.getElementById('editClienteId').value = c.id;
+  document.getElementById('cDni').value = c.dni; document.getElementById('cDni').disabled = true;
+  document.getElementById('cCuit').value = c.cuit || '';
+  document.getElementById('cNombre').value = c.nombre;
+  document.getElementById('cApellido').value = c.apellido;
+  document.getElementById('cTelefono').value = c.telefono || '';
+  document.getElementById('cEmail').value = c.email || '';
+  document.getElementById('cDomicilio').value = c.domicilio || '';
+  document.getElementById('cLocalidad').value = c.localidad || '';
+  document.getElementById('cProvincia').value = c.provincia || 'Buenos Aires';
+  document.getElementById('cSectorAlquiler').checked = c.sector_alquiler;
+  document.getElementById('cSectorVentas').checked = c.sector_ventas;
+  document.getElementById('cSectorGps').checked = c.sector_gps;
+  document.getElementById('cNotas').value = c.notas || '';
+  document.getElementById('clienteFormError').style.display = 'none';
+  document.getElementById('modalClienteTitle').textContent = 'Editar Cliente';
+  document.getElementById('btnGuardarCliente').textContent = 'Guardar Cambios';
+  openModal('modalCliente');
+}
+
+async function guardarCliente() {
+  const id = document.getElementById('editClienteId').value;
+  const dni = document.getElementById('cDni').value.trim();
+  const nombre = document.getElementById('cNombre').value.trim();
+  const apellido = document.getElementById('cApellido').value.trim();
+  const errEl = document.getElementById('clienteFormError');
+  if (!dni || !nombre || !apellido) { errEl.textContent = 'DNI, nombre y apellido son obligatorios.'; errEl.style.display = 'block'; return; }
+  const btn = document.getElementById('btnGuardarCliente');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+  try {
+    const params = {
+      p_dni: dni, p_nombre: nombre, p_apellido: apellido,
+      p_cuit: document.getElementById('cCuit').value.trim() || null,
+      p_telefono: document.getElementById('cTelefono').value.trim() || null,
+      p_email: document.getElementById('cEmail').value.trim() || null,
+      p_domicilio: document.getElementById('cDomicilio').value.trim() || null,
+      p_localidad: document.getElementById('cLocalidad').value.trim() || null,
+      p_provincia: document.getElementById('cProvincia').value.trim() || null,
+      p_sector_alquiler: document.getElementById('cSectorAlquiler').checked,
+      p_sector_ventas: document.getElementById('cSectorVentas').checked,
+      p_sector_gps: document.getElementById('cSectorGps').checked,
+      p_notas: document.getElementById('cNotas').value.trim() || null
+    };
+    let result;
+    if (id) { params.p_id = id; result = await rpc('fn_actualizar_cliente', params); }
+    else { result = await rpc('fn_crear_cliente', params); }
+    if (result && result.ok) { closeModal('modalCliente'); showToast(id ? 'Cliente actualizado' : 'Cliente creado'); cargarClientes(); }
+    else { errEl.textContent = (result && result.error) || 'Error al guardar'; errEl.style.display = 'block'; }
+  } catch (err) { errEl.textContent = 'Error: ' + err.message; errEl.style.display = 'block'; }
+  btn.disabled = false; btn.textContent = id ? 'Guardar Cambios' : 'Crear Cliente';
+}
+
+async function eliminarCliente(id) {
+  if (!confirm('¿Desactivar este cliente?')) return;
+  try {
+    const r = await rpc('fn_eliminar_cliente', { p_id: id });
+    if (r && r.ok) { showToast('Cliente desactivado'); cargarClientes(); }
+    else showToast((r && r.error) || 'Error', 'error');
+  } catch (err) { showToast('Error de conexión', 'error'); }
+}
+
+// ═══ CRM: MOTOVEHÍCULOS ═══
+const estadoMotoLabel = { en_salon:'En salón', reservada:'Reservada', en_tramite:'En trámite', alquilada:'Alquilada', vendida:'Vendida', en_taller:'En taller', baja:'Baja' };
+const estadoMotoColor = { en_salon:'green', reservada:'blue', en_tramite:'yellow', alquilada:'purple', vendida:'blue', en_taller:'yellow', baja:'red' };
+
+async function cargarMotos() {
+  const loading = document.getElementById('motoListLoading');
+  const wrap = document.getElementById('motoTableWrap');
+  const tbody = document.getElementById('motoTableBody');
+  loading.style.display = 'block'; wrap.style.display = 'none';
+  try {
+    const data = await rpc('fn_listar_motos');
+    tbody.innerHTML = '';
+    if (data && data.length) {
+      document.getElementById('motoCount').textContent = data.length + ' motovehículos activos';
+      data.forEach(m => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-variant-numeric:tabular-nums">${esc(m.patente || 'S/P')}</td>
+          <td><strong>${esc(m.marca)} ${esc(m.modelo)}</strong></td>
+          <td>${esc(m.cilindrada || '—')}</td>
+          <td>${esc(m.color || '—')}</td>
+          <td><span class="pill ${estadoMotoColor[m.estado] || 'blue'}">${estadoMotoLabel[m.estado] || m.estado}</span></td>
+          <td>${esc(m.sector === 'ambos' ? 'Alquiler / Venta' : m.sector === 'venta' ? 'Venta' : 'Alquiler')}</td>
+          <td>
+            <div class="user-actions-cell">
+              <button onclick='editarMoto(${JSON.stringify(m).replace(/'/g,"&#39;")})' title="Editar">✏️</button>
+              <button class="btn-danger" onclick="eliminarMoto('${m.id}')" title="Dar de baja">🚫</button>
+            </div>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    } else {
+      document.getElementById('motoCount').textContent = '0 motovehículos';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-secondary);padding:24px">No hay motovehículos registrados</td></tr>';
+    }
+    loading.style.display = 'none'; wrap.style.display = 'block';
+  } catch (err) { loading.textContent = 'Error: ' + err.message; }
+}
+
+function resetMotoForm() {
+  ['editMotoId','mMarca','mModelo','mCilindrada','mColor','mPatente','mMotor','mCuadro','mNotas'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('mAnio').value = ''; document.getElementById('mKm').value = '0';
+  document.getElementById('mEstado').value = 'en_salon'; document.getElementById('mSector').value = 'alquiler';
+  document.getElementById('mPrecioCompra').value = ''; document.getElementById('mPrecioVenta').value = '';
+  document.getElementById('mPrecioAlquiler').value = '';
+  document.getElementById('motoFormError').style.display = 'none';
+  document.getElementById('modalMotoTitle').textContent = 'Nuevo Motovehículo';
+  document.getElementById('btnGuardarMoto').textContent = 'Crear Motovehículo';
+}
+
+function editarMoto(m) {
+  document.getElementById('editMotoId').value = m.id;
+  document.getElementById('mMarca').value = m.marca;
+  document.getElementById('mModelo').value = m.modelo;
+  document.getElementById('mCilindrada').value = m.cilindrada || '';
+  document.getElementById('mAnio').value = m.anio || '';
+  document.getElementById('mColor').value = m.color || '';
+  document.getElementById('mPatente').value = m.patente || '';
+  document.getElementById('mMotor').value = m.numero_motor || '';
+  document.getElementById('mCuadro').value = m.numero_cuadro || '';
+  document.getElementById('mKm').value = m.kilometraje || 0;
+  document.getElementById('mEstado').value = m.estado;
+  document.getElementById('mPrecioCompra').value = m.precio_compra || '';
+  document.getElementById('mPrecioVenta').value = m.precio_venta || '';
+  document.getElementById('mPrecioAlquiler').value = m.precio_alquiler_mensual || '';
+  document.getElementById('mSector').value = m.sector || 'alquiler';
+  document.getElementById('mNotas').value = m.notas || '';
+  document.getElementById('motoFormError').style.display = 'none';
+  document.getElementById('modalMotoTitle').textContent = 'Editar Motovehículo';
+  document.getElementById('btnGuardarMoto').textContent = 'Guardar Cambios';
+  openModal('modalMoto');
+}
+
+async function guardarMoto() {
+  const id = document.getElementById('editMotoId').value;
+  const marca = document.getElementById('mMarca').value.trim();
+  const modelo = document.getElementById('mModelo').value.trim();
+  const errEl = document.getElementById('motoFormError');
+  if (!marca || !modelo) { errEl.textContent = 'Marca y modelo son obligatorios.'; errEl.style.display = 'block'; return; }
+  const btn = document.getElementById('btnGuardarMoto');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+  try {
+    const params = {
+      p_marca: marca, p_modelo: modelo,
+      p_cilindrada: document.getElementById('mCilindrada').value.trim() || null,
+      p_anio: parseInt(document.getElementById('mAnio').value) || null,
+      p_color: document.getElementById('mColor').value.trim() || null,
+      p_patente: document.getElementById('mPatente').value.trim().toUpperCase() || null,
+      p_numero_motor: document.getElementById('mMotor').value.trim() || null,
+      p_numero_cuadro: document.getElementById('mCuadro').value.trim() || null,
+      p_kilometraje: parseInt(document.getElementById('mKm').value) || 0,
+      p_estado: document.getElementById('mEstado').value,
+      p_precio_compra: parseFloat(document.getElementById('mPrecioCompra').value) || null,
+      p_precio_venta: parseFloat(document.getElementById('mPrecioVenta').value) || null,
+      p_precio_alquiler_mensual: parseFloat(document.getElementById('mPrecioAlquiler').value) || null,
+      p_sector: document.getElementById('mSector').value,
+      p_notas: document.getElementById('mNotas').value.trim() || null
+    };
+    let result;
+    if (id) { params.p_id = id; result = await rpc('fn_actualizar_moto', params); }
+    else { result = await rpc('fn_crear_moto', params); }
+    if (result && result.ok) { closeModal('modalMoto'); showToast(id ? 'Motovehículo actualizado' : 'Motovehículo creado'); cargarMotos(); }
+    else { errEl.textContent = (result && result.error) || 'Error al guardar'; errEl.style.display = 'block'; }
+  } catch (err) { errEl.textContent = 'Error: ' + err.message; errEl.style.display = 'block'; }
+  btn.disabled = false; btn.textContent = id ? 'Guardar Cambios' : 'Crear Motovehículo';
+}
+
+async function eliminarMoto(id) {
+  if (!confirm('¿Dar de baja este motovehículo?')) return;
+  try {
+    const r = await rpc('fn_eliminar_moto', { p_id: id });
+    if (r && r.ok) { showToast('Motovehículo dado de baja'); cargarMotos(); }
+    else showToast((r && r.error) || 'Error', 'error');
+  } catch (err) { showToast('Error de conexión', 'error'); }
+}
+
+// ═══ SECTOR 1: CONTRATOS ═══
+const estadoContratoLabel = { activo:'Activo', finalizado:'Finalizado', rescindido:'Rescindido', opcion_compra:'Opción Compra', mora:'En mora' };
+const estadoContratoColor = { activo:'green', finalizado:'blue', rescindido:'red', opcion_compra:'yellow', mora:'red' };
+
+function fmtMoney(n) { return n ? '$' + Number(n).toLocaleString('es-AR') : '—'; }
+function fmtDate(d) { if (!d) return '—'; const p = d.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+
+async function cargarContratos(estado, btnEl) {
+  if (btnEl) {
+    document.querySelectorAll('#view-s1-contratos .tabs .tab-btn').forEach(b => b.classList.remove('active'));
+    btnEl.classList.add('active');
+  }
+  const loading = document.getElementById('contratoListLoading');
+  const wrap = document.getElementById('contratoTableWrap');
+  const tbody = document.getElementById('contratoTableBody');
+  loading.style.display = 'block'; wrap.style.display = 'none';
+  try {
+    const params = estado ? { p_estado: estado } : {};
+    const data = await rpc('fn_listar_contratos', params);
+    tbody.innerHTML = '';
+    if (data && data.length) {
+      data.forEach(c => {
+        const tr = document.createElement('tr');
+        const restante = c.meses_restantes <= 0 ? '<span class="pill yellow">Cumplido</span>' :
+          c.meses_restantes + '/' + c.plazo_meses + ' meses';
+        tr.innerHTML = `
+          <td><strong>${esc(c.numero_contrato)}</strong></td>
+          <td>${esc(c.cliente_nombre)}</td>
+          <td>${esc(c.vehiculo_nombre)}</td>
+          <td style="font-variant-numeric:tabular-nums">${fmtDate(c.fecha_inicio)}</td>
+          <td>${c.plazo_meses} meses</td>
+          <td style="font-variant-numeric:tabular-nums">${fmtMoney(c.valor_cuota)}</td>
+          <td>${restante}</td>
+          <td><span class="pill ${estadoContratoColor[c.estado] || 'blue'}">${estadoContratoLabel[c.estado] || c.estado}</span></td>
+          <td>
+            <div class="user-actions-cell">
+              ${c.estado === 'activo' ? `<button onclick="cambiarEstadoContrato('${c.id}','finalizado')" title="Finalizar">✅</button>` : ''}
+              ${c.estado === 'activo' ? `<button class="btn-danger" onclick="cambiarEstadoContrato('${c.id}','rescindido')" title="Rescindir">🚫</button>` : ''}
+            </div>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    } else {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-secondary);padding:24px">No hay contratos</td></tr>';
+    }
+    loading.style.display = 'none'; wrap.style.display = 'block';
+  } catch (err) { loading.textContent = 'Error: ' + err.message; }
+}
+
+async function abrirNuevoContrato() {
+  document.getElementById('contratoFormError').style.display = 'none';
+  // Cargar selects de clientes y motos disponibles
+  const selCli = document.getElementById('ctCliente');
+  const selMoto = document.getElementById('ctMoto');
+  selCli.innerHTML = '<option value="">Cargando...</option>';
+  selMoto.innerHTML = '<option value="">Cargando...</option>';
+  openModal('modalContrato');
+  try {
+    const [clientes, motos] = await Promise.all([rpc('fn_listar_clientes'), rpc('fn_listar_motos')]);
+    selCli.innerHTML = '<option value="">Seleccionar cliente...</option>';
+    if (clientes) clientes.forEach(c => { selCli.innerHTML += `<option value="${c.id}">${esc(c.apellido)}, ${esc(c.nombre)} — DNI ${esc(c.dni)}</option>`; });
+    selMoto.innerHTML = '<option value="">Seleccionar moto...</option>';
+    if (motos) motos.filter(m => m.estado === 'en_salon').forEach(m => { selMoto.innerHTML += `<option value="${m.id}">${esc(m.marca)} ${esc(m.modelo)} ${m.patente ? '('+esc(m.patente)+')' : ''}</option>`; });
+  } catch (err) { selCli.innerHTML = '<option value="">Error cargando</option>'; }
+}
+
+async function guardarContrato() {
+  const clienteId = document.getElementById('ctCliente').value;
+  const motoId = document.getElementById('ctMoto').value;
+  const fechaInicio = document.getElementById('ctFechaInicio').value;
+  const valorCuota = parseFloat(document.getElementById('ctValorCuota').value);
+  const errEl = document.getElementById('contratoFormError');
+  if (!clienteId || !motoId || !fechaInicio || !valorCuota) {
+    errEl.textContent = 'Completá cliente, moto, fecha y valor de cuota.'; errEl.style.display = 'block'; return;
+  }
+  const btn = document.getElementById('btnGuardarContrato');
+  btn.disabled = true; btn.textContent = 'Creando...';
+  try {
+    const result = await rpc('fn_crear_contrato', {
+      p_cliente_id: clienteId, p_vehiculo_id: motoId,
+      p_fecha_inicio: fechaInicio,
+      p_plazo_meses: parseInt(document.getElementById('ctPlazo').value) || 10,
+      p_valor_activo: parseFloat(document.getElementById('ctValorActivo').value) || 0,
+      p_anticipo: parseFloat(document.getElementById('ctAnticipo').value) || 0,
+      p_cantidad_cuotas: parseInt(document.getElementById('ctCuotas').value) || 10,
+      p_valor_cuota: valorCuota,
+      p_opcion_compra_valor: parseFloat(document.getElementById('ctOpcionCompra').value) || null,
+      p_notas: document.getElementById('ctNotas').value.trim() || null
+    });
+    if (result && result.ok) {
+      closeModal('modalContrato'); showToast('Contrato ' + result.numero + ' creado');
+      cargarContratos(null);
+    } else { errEl.textContent = (result && result.error) || 'Error al crear contrato'; errEl.style.display = 'block'; }
+  } catch (err) { errEl.textContent = 'Error: ' + err.message; errEl.style.display = 'block'; }
+  btn.disabled = false; btn.textContent = 'Crear Contrato';
+}
+
+async function cambiarEstadoContrato(id, nuevoEstado) {
+  const label = nuevoEstado === 'finalizado' ? 'finalizar' : 'rescindir';
+  if (!confirm('¿' + label.charAt(0).toUpperCase() + label.slice(1) + ' este contrato? La moto volverá a quedar disponible.')) return;
+  try {
+    const r = await rpc('fn_actualizar_contrato', { p_id: id, p_estado: nuevoEstado });
+    if (r && r.ok) { showToast('Contrato ' + (nuevoEstado === 'finalizado' ? 'finalizado' : 'rescindido')); cargarContratos(null); }
+    else showToast((r && r.error) || 'Error', 'error');
+  } catch (err) { showToast('Error de conexión', 'error'); }
+}
+
+// ═══ SECTOR 2: INVENTARIO ═══
+function switchInventarioTab(tab) {
+  document.querySelectorAll('#view-s2-stock .config-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('invTab-' + tab)?.classList.add('active');
+  document.querySelectorAll('#view-s2-stock > .tabs .tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', ['alquiler','deposito'][i] === tab);
+  });
+  if (tab === 'alquiler') cargarInventarioAlquiler();
+  if (tab === 'deposito') cargarInventarioDeposito();
+}
+
+async function cargarInventarioAlquiler() {
+  const loading = document.getElementById('invAlquilerLoading');
+  const wrap = document.getElementById('invAlquilerWrap');
+  const container = document.getElementById('invAlquilerCards');
+  loading.style.display = 'block'; wrap.style.display = 'none';
+  try {
+    const data = await rpc('fn_inventario_alquiler');
+    container.innerHTML = '';
+    if (data && data.length) {
+      data.forEach(item => {
+        const pct = item.plazo_meses > 0 ? Math.round((item.meses_transcurridos / item.plazo_meses) * 100) : 100;
+        const barColor = item.meses_restantes <= 1 ? 'var(--warning)' : item.meses_restantes <= 3 ? 'var(--info)' : 'var(--accent)';
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px">
+            <div>
+              <div style="font-family:var(--font-display);font-size:15px;font-weight:600">${esc(item.marca)} ${esc(item.modelo)}</div>
+              <div style="font-size:12px;color:var(--text-secondary)">${esc(item.patente || 'S/P')} · ${esc(item.color || '')}</div>
+            </div>
+            <span class="pill ${item.contrato_estado === 'mora' ? 'red' : 'purple'}">${item.contrato_estado === 'mora' ? 'En mora' : 'En alquiler'}</span>
+          </div>
+          <div style="font-size:13px;margin-bottom:8px">
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text-secondary)">Cliente:</span> <strong>${esc(item.cliente_nombre)}</strong></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text-secondary)">Contrato:</span> <span>${esc(item.numero_contrato)}</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text-secondary)">Cuota:</span> <span style="font-variant-numeric:tabular-nums">${fmtMoney(item.valor_cuota)}</span></div>
+          </div>
+          <div style="margin-top:12px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+              <span style="color:var(--text-secondary)">${item.meses_transcurridos} de ${item.plazo_meses} meses</span>
+              <strong style="color:${barColor}">${item.meses_restantes} mes${item.meses_restantes !== 1 ? 'es' : ''} restante${item.meses_restantes !== 1 ? 's' : ''}</strong>
+            </div>
+            <div style="background:var(--bg-elevated);border-radius:6px;height:8px;overflow:hidden">
+              <div style="background:${barColor};height:100%;width:${Math.min(pct,100)}%;border-radius:6px;transition:width 0.5s"></div>
+            </div>
+            ${item.meses_restantes <= 0 ? '<div style="margin-top:8px;font-size:12px;color:var(--warning);font-weight:600">⚠ Plazo cumplido — pasa a propiedad del cliente</div>' : ''}
+          </div>`;
+        container.appendChild(card);
+      });
+    } else {
+      container.innerHTML = '<div style="text-align:center;color:var(--text-secondary);padding:40px;grid-column:1/-1">No hay motos en alquiler actualmente</div>';
+    }
+    loading.style.display = 'none'; wrap.style.display = 'block';
+  } catch (err) { loading.textContent = 'Error: ' + err.message; }
+}
+
+async function cargarInventarioDeposito() {
+  const loading = document.getElementById('invDepositoLoading');
+  const wrap = document.getElementById('invDepositoWrap');
+  const container = document.getElementById('invDepositoCards');
+  loading.style.display = 'block'; wrap.style.display = 'none';
+  try {
+    const data = await rpc('fn_inventario_deposito');
+    container.innerHTML = '';
+    if (data && data.length) {
+      data.forEach(m => {
+        const card = document.createElement('div');
+        card.className = 'moto-card';
+        card.innerHTML = `
+          <div class="moto-img">🏍️<div class="moto-status"><span class="pill ${estadoMotoColor[m.estado] || 'green'}">${estadoMotoLabel[m.estado] || m.estado}</span></div></div>
+          <div class="moto-body">
+            <div class="moto-brand">${esc(m.marca)}</div>
+            <div class="moto-name">${esc(m.modelo)}</div>
+            <div class="moto-specs"><span>${esc(m.cilindrada || '—')}</span><span>${m.kilometraje || 0} km</span><span>${esc(m.color || '—')}</span></div>
+            <div class="moto-price">${fmtMoney(m.precio_venta)}${m.precio_compra ? '<span class="moto-cost">Costo: ' + fmtMoney(m.precio_compra) + '</span>' : ''}</div>
+          </div>`;
+        container.appendChild(card);
+      });
+    } else {
+      container.innerHTML = '<div style="text-align:center;color:var(--text-secondary);padding:40px;grid-column:1/-1">No hay motos en depósito</div>';
+    }
+    loading.style.display = 'none'; wrap.style.display = 'block';
+  } catch (err) { loading.textContent = 'Error: ' + err.message; }
 }
 
 const viewTitles = {
