@@ -941,35 +941,19 @@ tbody tr:hover { background: var(--bg-hover); }
 
     <!-- ═══ DASHBOARD GLOBAL ═══ -->
     <div class="view active" id="view-dashboard">
-      <div class="stats-grid">
-        <div class="stat-card s1">
-          <div class="stat-label">Alquileres Activos</div>
-          <div class="stat-value">127</div>
-          <div class="stat-delta up">▲ 12% vs. mes ant.</div>
-        </div>
-        <div class="stat-card s2">
-          <div class="stat-label">Ventas del Mes</div>
-          <div class="stat-value">34</div>
-          <div class="stat-delta up">▲ 8% vs. mes ant.</div>
-        </div>
-        <div class="stat-card s3">
-          <div class="stat-label">Dispositivos GPS Activos</div>
-          <div class="stat-value">312</div>
-          <div class="stat-delta up">▲ 15% vs. mes ant.</div>
-        </div>
-        <div class="stat-card warn">
-          <div class="stat-label">Cuotas Vencidas Hoy</div>
-          <div class="stat-value">5</div>
-          <div class="stat-delta down">▼ Requiere atención</div>
-        </div>
+      <div class="stats-grid" id="dashStats">
+        <div class="stat-card s1"><div class="stat-label">Contratos Activos</div><div class="stat-value" id="dContratosActivos">—</div></div>
+        <div class="stat-card warn"><div class="stat-label">En Mora</div><div class="stat-value" id="dContratosMora">—</div></div>
+        <div class="stat-card s2"><div class="stat-label">Total Clientes</div><div class="stat-value" id="dTotalClientes">—</div></div>
+        <div class="stat-card s3"><div class="stat-label">Total Motos</div><div class="stat-value" id="dTotalMotos">—</div></div>
       </div>
 
       <div class="grid-2">
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">Ingresos por Sector — Últimos 6 Meses</div>
-              <div class="card-subtitle">En miles de ARS</div>
+              <div class="card-title">Resumen General</div>
+              <div class="card-subtitle">Datos en tiempo real</div>
             </div>
           </div>
           <div class="chart-container">
