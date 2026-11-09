@@ -1156,16 +1156,13 @@ tbody tr:hover { background: var(--bg-hover); }
         <div class="stat-card s1"><div class="stat-label">Pagos Pendientes</div><div class="stat-value" id="s1PagosPendientes" style="font-variant-numeric:tabular-nums">—</div></div>
       </div>
 
-      <div class="card" style="margin-top:20px">
-        <div class="card-header"><div class="card-title">Últimos Contratos de Alquiler</div></div>
-        <div id="s1UltContratosLoading" style="text-align:center;padding:20px;color:var(--text-secondary)">Cargando...</div>
+      <div style="margin-top:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h3 style="margin:0;color:var(--text-primary);font-size:16px">Contratos de Alquiler</h3>
+        </div>
+        <div id="s1UltContratosLoading" style="text-align:center;padding:40px;color:var(--text-secondary)">Cargando contratos...</div>
         <div id="s1UltContratosWrap" style="display:none">
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Cliente</th><th>Moto</th><th>Inicio</th><th>Cuotas</th><th>Monto</th><th>Estado</th></tr></thead>
-              <tbody id="s1UltContratosBody"></tbody>
-            </table>
-          </div>
+          <div id="s1ContratosCards" style="display:flex;flex-direction:column;gap:14px"></div>
         </div>
       </div>
     </div>
@@ -1185,7 +1182,7 @@ tbody tr:hover { background: var(--bg-hover); }
       <div id="contratoTableWrap" class="card" style="padding:0;display:none">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>#</th><th>Cliente</th><th>Unidad</th><th>Inicio</th><th>Plazo</th><th>Cuota</th><th>Meses Restantes</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <thead><tr><th>#</th><th>Cliente</th><th>CUIL</th><th>Unidad</th><th>Inicio</th><th>Plazo</th><th>Cuota</th><th>Semanas Restantes</th><th>Estado</th><th>Acciones</th></tr></thead>
             <tbody id="contratoTableBody"></tbody>
           </table>
         </div>
@@ -1194,12 +1191,22 @@ tbody tr:hover { background: var(--bg-hover); }
 
     <!-- ═══ SECTOR 1: COBRANZA ═══ -->
     <div class="view" id="view-s1-cobranza">
+      <!-- Mini panel de alertas 24h -->
+      <div id="alertasCuotas24h" class="card" style="margin-bottom:16px;border-left:4px solid var(--warning);display:none">
+        <div style="display:flex;align-items:center;gap:8px;padding:12px 16px">
+          <span style="font-size:20px">⚠️</span>
+          <div>
+            <strong style="color:var(--warning)">Cuotas próximas a vencer (24h)</strong>
+            <div id="alertasCuotasBody" style="margin-top:6px;font-size:13px;color:var(--text-secondary)"></div>
+          </div>
+        </div>
+      </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
         <div class="tabs" style="margin-bottom:0">
-          <button class="tab-btn active" onclick="cargarPagos(null, this)">Todos</button>
+          <button class="tab-btn active" onclick="cargarPagos('pendiente', this)">Pendientes</button>
           <button class="tab-btn" onclick="cargarPagos('acreditado', this)">Acreditados</button>
-          <button class="tab-btn" onclick="cargarPagos('pendiente', this)">Pendientes</button>
           <button class="tab-btn" onclick="cargarPagos('rechazado', this)">Rechazados</button>
+          <button class="tab-btn" onclick="cargarPagos(null, this)">Todos</button>
         </div>
         <button class="btn btn-primary" onclick="abrirNuevoPago()">+ Registrar Pago</button>
       </div>
@@ -1714,14 +1721,45 @@ tbody tr:hover { background: var(--bg-hover); }
     <div class="modal-body">
       <input type="hidden" id="editMotoId">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="form-group"><label class="form-label">Marca *</label><input class="form-input" id="mMarca" placeholder="Honda, Yamaha..."></div>
-        <div class="form-group"><label class="form-label">Modelo *</label><input class="form-input" id="mModelo" placeholder="Wave 110, FZ25..."></div>
-        <div class="form-group"><label class="form-label">Cilindrada</label><input class="form-input" id="mCilindrada" placeholder="110cc"></div>
-        <div class="form-group"><label class="form-label">Año</label><input class="form-input" id="mAnio" type="number" placeholder="2026"></div>
-        <div class="form-group"><label class="form-label">Color</label><input class="form-input" id="mColor" placeholder="Negro, Rojo..."></div>
+        <div class="form-group"><label class="form-label">Marca *</label>
+          <select class="form-input" id="mMarca" onchange="actualizarModelosPorMarca()">
+            <option value="">Seleccionar marca...</option>
+            <option>Honda</option><option>Yamaha</option><option>Zanella</option><option>Motomel</option>
+            <option>Corven</option><option>Gilera</option><option>Bajaj</option><option>TVS</option>
+            <option>Benelli</option><option>Royal Enfield</option><option>Kymco</option><option>SYM</option>
+            <option>Beta</option><option>Guerrero</option><option>Mondial</option><option>Jianshe</option>
+            <option>Kawasaki</option><option>Suzuki</option><option>KTM</option><option>CFMoto</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Modelo *</label>
+          <select class="form-input" id="mModelo"><option value="">Primero seleccioná marca...</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Cilindrada</label>
+          <select class="form-input" id="mCilindrada">
+            <option value="">Seleccionar...</option>
+            <option>110cc</option><option>125cc</option><option>150cc</option><option>160cc</option>
+            <option>200cc</option><option>250cc</option><option>300cc</option><option>400cc</option><option>500cc+</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Año</label>
+          <select class="form-input" id="mAnio">
+            <option value="">Seleccionar...</option>
+            <option>2027</option><option>2026</option><option>2025</option><option>2024</option><option>2023</option>
+            <option>2022</option><option>2021</option><option>2020</option><option>2019</option><option>2018</option>
+            <option>2017</option><option>2016</option><option>2015</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Color</label>
+          <select class="form-input" id="mColor">
+            <option value="">Seleccionar...</option>
+            <option>Negro</option><option>Blanco</option><option>Rojo</option><option>Azul</option>
+            <option>Gris</option><option>Plata</option><option>Verde</option><option>Amarillo</option>
+            <option>Naranja</option><option>Bordo</option><option>Celeste</option><option>Marrón</option>
+          </select>
+        </div>
         <div class="form-group"><label class="form-label">Patente</label><input class="form-input" id="mPatente" placeholder="AB 123 CD" style="text-transform:uppercase"></div>
-        <div class="form-group"><label class="form-label">N° Motor</label><input class="form-input" id="mMotor" placeholder="Número de motor"></div>
-        <div class="form-group"><label class="form-label">N° Cuadro</label><input class="form-input" id="mCuadro" placeholder="Número de cuadro"></div>
+        <div class="form-group"><label class="form-label">N° Motor</label><input class="form-input" id="mMotor" placeholder="Número de motor"><small id="mMotorHint" class="form-hint" style="color:var(--text-secondary);font-size:11px;margin-top:2px;display:block"></small></div>
+        <div class="form-group"><label class="form-label">N° Cuadro</label><input class="form-input" id="mCuadro" placeholder="Número de cuadro"><small id="mCuadroHint" class="form-hint" style="color:var(--text-secondary);font-size:11px;margin-top:2px;display:block"></small></div>
         <div class="form-group"><label class="form-label">Kilometraje</label><input class="form-input" id="mKm" type="number" value="0"></div>
         <div class="form-group"><label class="form-label">Estado</label>
           <select class="form-input" id="mEstado">
@@ -1731,10 +1769,10 @@ tbody tr:hover { background: var(--bg-hover); }
           </select>
         </div>
         <div class="form-group"><label class="form-label">Precio Compra</label><input class="form-input" id="mPrecioCompra" type="number" placeholder="0"></div>
-        <div class="form-group"><label class="form-label">Precio Venta</label><input class="form-input" id="mPrecioVenta" type="number" placeholder="0"></div>
-        <div class="form-group"><label class="form-label">Alquiler Mensual</label><input class="form-input" id="mPrecioAlquiler" type="number" placeholder="0"></div>
+        <div class="form-group" id="grpPrecioVenta"><label class="form-label">Precio Venta</label><input class="form-input" id="mPrecioVenta" type="number" placeholder="0"></div>
+        <div class="form-group" id="grpPrecioAlquiler"><label class="form-label">Alquiler Semanal</label><input class="form-input" id="mPrecioAlquiler" type="number" placeholder="0"></div>
         <div class="form-group"><label class="form-label">Sector</label>
-          <select class="form-input" id="mSector">
+          <select class="form-input" id="mSector" onchange="togglePreciosSector()">
             <option value="alquiler">Alquiler</option><option value="venta">Venta</option><option value="ambos">Ambos</option>
           </select>
         </div>
@@ -1762,10 +1800,10 @@ tbody tr:hover { background: var(--bg-hover); }
           <select class="form-input" id="ctMoto"><option value="">Seleccionar moto...</option></select>
         </div>
         <div class="form-group"><label class="form-label">Fecha Inicio *</label><input class="form-input" id="ctFechaInicio" type="date"></div>
-        <div class="form-group"><label class="form-label">Plazo (meses) *</label><input class="form-input" id="ctPlazo" type="number" value="10" min="1" max="10"></div>
+        <div class="form-group"><label class="form-label">Plazo (semanas) *</label><input class="form-input" id="ctPlazo" type="number" value="40" min="1" max="52"></div>
         <div class="form-group"><label class="form-label">Valor del Activo</label><input class="form-input" id="ctValorActivo" type="number" placeholder="0"></div>
         <div class="form-group"><label class="form-label">Anticipo</label><input class="form-input" id="ctAnticipo" type="number" placeholder="0"></div>
-        <div class="form-group"><label class="form-label">Cant. Cuotas</label><input class="form-input" id="ctCuotas" type="number" value="10" min="1"></div>
+        <div class="form-group"><label class="form-label">Cant. Cuotas</label><input class="form-input" id="ctCuotas" type="number" value="40" min="1"></div>
         <div class="form-group"><label class="form-label">Valor Cuota *</label><input class="form-input" id="ctValorCuota" type="number" placeholder="0"></div>
         <div class="form-group"><label class="form-label">Opción a Compra</label><input class="form-input" id="ctOpcionCompra" type="number" placeholder="0"></div>
       </div>
@@ -2300,21 +2338,83 @@ async function cargarMotos() {
   } catch (err) { loading.textContent = 'Error: ' + err.message; }
 }
 
+// ═══ Datos de modelos por marca ═══
+const modelosPorMarca = {
+  'Honda': ['Wave 110','Biz 125','CB 125F','CG 150 Titán','XR 150L','CB 190R','XR 190','CB 250 Twister','XR 250 Tornado','CBR 250R','CB 300F','CRF 300L','CB 500F','CB 500X'],
+  'Yamaha': ['Crypton 110','Ray ZR 125','YBR 125','FZ 16','FZ 25','MT-03','MT-07','XTZ 125','XTZ 250','R15','R3','NMAX 155','Tricity 155'],
+  'Zanella': ['ZB 110','Sapucai 150','RX 150','Patagonian Eagle 150','Patagonian Eagle 250','Ceccato 150','Ceccato 250','ZR 150','ZR 250'],
+  'Motomel': ['B 110','S2 150','S3 150','Skua 150','Skua 200','Skua 250','Sirius 190','CG 150','Strato 150','Blitz 110'],
+  'Corven': ['Energy 110','Triax 150','Triax 200','Triax 250','Indiana 256','TXR 250'],
+  'Gilera': ['Smash 110','Smash 125','VC 150','YL 200','SMX 200','SMX 250','SMX 400'],
+  'Bajaj': ['Boxer 150','Rouser NS 125','Rouser NS 160','Rouser NS 200','Rouser RS 200','Rouser NS 250','Dominar 250','Dominar 400'],
+  'TVS': ['Star HLX 150','Apache RTR 160','Apache RTR 200','Ntorq 125','Raider 125'],
+  'Benelli': ['TNT 15','TNT 150','Leoncino 250','302S','TNT 300','302R','TRK 251','TRK 502'],
+  'Royal Enfield': ['Meteor 350','Classic 350','Hunter 350','Himalayan','Continental GT 650','INT 650'],
+  'Kymco': ['Agility 125','Agility 200','Like 150','Downtown 350','AK 550'],
+  'SYM': ['Symphony 125','Symphony 150','Fiddle 150','Joymax Z 300','Maxsym 400','Cruisym 300'],
+  'Beta': ['BK 150','Caballero 200','TR 200','Zontes 310'],
+  'Guerrero': ['Trip 110','GC 150','GMX 250','GR5 250'],
+  'Mondial': ['LD 110','HD 150','HD 250','TD 150'],
+  'Jianshe': ['JS 125','JS 150','JS 250'],
+  'Kawasaki': ['Z125','Ninja 300','Z400','Ninja 400','Versys 300','Z650','Ninja 650'],
+  'Suzuki': ['AX 100','GN 125','Gixxer 150','Gixxer 250','V-Strom 250','GSX-S300'],
+  'KTM': ['Duke 200','Duke 250','Duke 390','RC 200','RC 390','Adventure 250','Adventure 390'],
+  'CFMoto': ['NK 250','NK 400','650 MT','650 NK','800 MT']
+};
+const chasisHints = {
+  'Honda': 'Ej: 9C2KC08...(17 dígitos)',
+  'Yamaha': 'Ej: LBPKE08...(17 dígitos)',
+  'Zanella': 'Ej: 8CH...(17 dígitos)',
+  'Bajaj': 'Ej: MD2A...(17 dígitos)',
+  'Benelli': 'Ej: LWLPCJ...(17 dígitos)'
+};
+const motorHints = {
+  'Honda': 'Ej: KC08E-...(9+ dígitos)',
+  'Yamaha': 'Ej: E3R7E-...(9+ dígitos)',
+  'Bajaj': 'Ej: DHMBS...(serie alfanum.)'
+};
+
+function actualizarModelosPorMarca() {
+  const marca = document.getElementById('mMarca').value;
+  const selModelo = document.getElementById('mModelo');
+  const modelos = modelosPorMarca[marca] || [];
+  selModelo.innerHTML = modelos.length
+    ? '<option value="">Seleccionar modelo...</option>' + modelos.map(m => `<option>${m}</option>`).join('')
+    : '<option value="">Primero seleccioná marca...</option>';
+  // Update chasis/motor hints
+  document.getElementById('mCuadroHint').textContent = chasisHints[marca] || '';
+  document.getElementById('mMotorHint').textContent = motorHints[marca] || '';
+}
+
+function togglePreciosSector() {
+  const sector = document.getElementById('mSector').value;
+  const grpVenta = document.getElementById('grpPrecioVenta');
+  const grpAlquiler = document.getElementById('grpPrecioAlquiler');
+  grpVenta.style.display = (sector === 'alquiler') ? 'none' : '';
+  grpAlquiler.style.display = (sector === 'venta') ? 'none' : '';
+}
+
 function resetMotoForm() {
-  ['editMotoId','mMarca','mModelo','mCilindrada','mColor','mPatente','mMotor','mCuadro','mNotas'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('mAnio').value = ''; document.getElementById('mKm').value = '0';
+  ['editMotoId','mPatente','mMotor','mCuadro','mNotas'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('mMarca').value = ''; document.getElementById('mModelo').innerHTML = '<option value="">Primero seleccioná marca...</option>';
+  document.getElementById('mCilindrada').value = ''; document.getElementById('mAnio').value = ''; document.getElementById('mColor').value = '';
+  document.getElementById('mKm').value = '0';
   document.getElementById('mEstado').value = 'en_salon'; document.getElementById('mSector').value = 'alquiler';
   document.getElementById('mPrecioCompra').value = ''; document.getElementById('mPrecioVenta').value = '';
   document.getElementById('mPrecioAlquiler').value = '';
+  document.getElementById('mCuadroHint').textContent = ''; document.getElementById('mMotorHint').textContent = '';
   document.getElementById('motoFormError').style.display = 'none';
   document.getElementById('modalMotoTitle').textContent = 'Nuevo Motovehículo';
   document.getElementById('btnGuardarMoto').textContent = 'Crear Motovehículo';
+  togglePreciosSector();
 }
 
 function editarMoto(m) {
   document.getElementById('editMotoId').value = m.id;
-  document.getElementById('mMarca').value = m.marca;
-  document.getElementById('mModelo').value = m.modelo;
+  document.getElementById('mMarca').value = m.marca || '';
+  actualizarModelosPorMarca();
+  // Set modelo after populating the dropdown
+  setTimeout(() => { document.getElementById('mModelo').value = m.modelo || ''; }, 0);
   document.getElementById('mCilindrada').value = m.cilindrada || '';
   document.getElementById('mAnio').value = m.anio || '';
   document.getElementById('mColor').value = m.color || '';
@@ -2327,6 +2427,7 @@ function editarMoto(m) {
   document.getElementById('mPrecioVenta').value = m.precio_venta || '';
   document.getElementById('mPrecioAlquiler').value = m.precio_alquiler_mensual || '';
   document.getElementById('mSector').value = m.sector || 'alquiler';
+  togglePreciosSector();
   document.getElementById('mNotas').value = m.notas || '';
   document.getElementById('motoFormError').style.display = 'none';
   document.getElementById('modalMotoTitle').textContent = 'Editar Motovehículo';
@@ -2400,14 +2501,17 @@ async function cargarContratos(estado, btnEl) {
     if (data && data.length) {
       data.forEach(c => {
         const tr = document.createElement('tr');
-        const restante = c.meses_restantes <= 0 ? '<span class="pill yellow">Cumplido</span>' :
-          c.meses_restantes + '/' + c.plazo_meses + ' meses';
+        const semanasRestantes = c.meses_restantes != null ? c.meses_restantes : 0;
+        const plazoSemanas = c.plazo_meses || 40;
+        const restante = semanasRestantes <= 0 ? '<span class="pill yellow">Cumplido</span>' :
+          String(semanasRestantes).padStart(2,'0') + '/' + plazoSemanas + ' semanas';
         tr.innerHTML = `
           <td><strong>${esc(c.numero_contrato)}</strong></td>
           <td>${esc(c.cliente_nombre)}</td>
+          <td>${esc(c.cliente_cuil || '—')}</td>
           <td>${esc(c.vehiculo_nombre)}</td>
           <td style="font-variant-numeric:tabular-nums">${fmtDate(c.fecha_inicio)}</td>
-          <td>${c.plazo_meses} meses</td>
+          <td>${plazoSemanas} semanas</td>
           <td style="font-variant-numeric:tabular-nums">${fmtMoney(c.valor_cuota)}</td>
           <td>${restante}</td>
           <td><span class="pill ${estadoContratoColor[c.estado] || 'blue'}">${estadoContratoLabel[c.estado] || c.estado}</span></td>
@@ -2420,7 +2524,7 @@ async function cargarContratos(estado, btnEl) {
         tbody.appendChild(tr);
       });
     } else {
-      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-secondary);padding:24px">No hay contratos</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text-secondary);padding:24px">No hay contratos</td></tr>';
     }
     loading.style.display = 'none'; wrap.style.display = 'block';
   } catch (err) { loading.textContent = 'Error: ' + err.message; }
@@ -2458,10 +2562,10 @@ async function guardarContrato() {
     const result = await rpc('fn_crear_contrato', {
       p_cliente_id: clienteId, p_vehiculo_id: motoId,
       p_fecha_inicio: fechaInicio,
-      p_plazo_meses: parseInt(document.getElementById('ctPlazo').value) || 10,
+      p_plazo_meses: parseInt(document.getElementById('ctPlazo').value) || 40,
       p_valor_activo: parseFloat(document.getElementById('ctValorActivo').value) || 0,
       p_anticipo: parseFloat(document.getElementById('ctAnticipo').value) || 0,
-      p_cantidad_cuotas: parseInt(document.getElementById('ctCuotas').value) || 10,
+      p_cantidad_cuotas: parseInt(document.getElementById('ctCuotas').value) || 40,
       p_valor_cuota: valorCuota,
       p_opcion_compra_valor: parseFloat(document.getElementById('ctOpcionCompra').value) || null,
       p_notas: document.getElementById('ctNotas').value.trim() || null
@@ -2606,7 +2710,7 @@ function switchView(id) {
     'crm': () => { cargarClientes(); cargarMotos(); },
     's1-dashboard': cargarPanelAlquiler,
     's1-contratos': () => cargarContratos(),
-    's1-cobranza': () => cargarPagos(),
+    's1-cobranza': () => cargarPagos('pendiente'),
     's1-scoring': cargarScoring,
     's2-dashboard': () => cargarVentas(),
     's2-stock': () => cargarInventarioAlquiler(),
@@ -2651,20 +2755,42 @@ async function cargarPanelAlquiler() {
     if (el('s1MotosAlquiladas')) el('s1MotosAlquiladas').textContent = s.motos_alquiladas ?? 0;
     if (el('s1ContratosMora')) el('s1ContratosMora').textContent = s.contratos_mora ?? 0;
     if (el('s1PagosPendientes')) el('s1PagosPendientes').textContent = fmtMoney(s.pagos_pendientes ?? 0);
-    // Load latest contracts table
+    // Load contracts as cards
     const cts = await rpc('fn_listar_contratos');
     const loading = document.getElementById('s1UltContratosLoading');
     const wrap = document.getElementById('s1UltContratosWrap');
-    const body = document.getElementById('s1UltContratosBody');
-    const list = Array.isArray(cts) ? cts.slice(0, 10) : [];
-    body.innerHTML = list.length ? list.map(c => `<tr>
-      <td>${esc(c.cliente_nombre || '—')}</td>
-      <td>${esc(c.moto_descripcion || '—')}</td>
-      <td>${fmtDate(c.fecha_inicio)}</td>
-      <td>${c.cantidad_cuotas || '—'}</td>
-      <td style="font-variant-numeric:tabular-nums">${fmtMoney(c.valor_cuota)}</td>
-      <td><span class="pill ${estadoContratoColor[c.estado] || ''}">${estadoContratoLabel[c.estado] || c.estado}</span></td>
-    </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--text-secondary)">Sin contratos</td></tr>';
+    const cardsEl = document.getElementById('s1ContratosCards');
+    const list = Array.isArray(cts) ? cts : [];
+    if (list.length) {
+      cardsEl.innerHTML = list.map(c => {
+        const semanasRestantes = c.meses_restantes != null ? c.meses_restantes : 0;
+        const plazo = c.plazo_meses || 40;
+        const cuotaActual = plazo - semanasRestantes;
+        const color = estadoContratoColor[c.estado] || 'blue';
+        const motoDesc = (c.vehiculo_nombre || c.moto_descripcion || '—') + (c.vehiculo_patente ? ' (' + esc(c.vehiculo_patente) + ')' : '');
+        // Calculate fecha fin (plazo semanas from inicio)
+        let fechaFin = '—';
+        if (c.fecha_inicio) {
+          const fi = new Date(c.fecha_inicio);
+          fi.setDate(fi.getDate() + plazo * 7);
+          fechaFin = fmtDate(fi.toISOString().split('T')[0]);
+        }
+        return `<div style="background:var(--bg-tertiary);border:1px solid var(--border);border-radius:10px;padding:16px 20px;border-left:4px solid var(--${color === 'green' ? 'success' : color === 'red' ? 'danger' : color === 'yellow' ? 'warning' : 'primary'})">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px 20px;align-items:center">
+            <div><span style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px">Cliente</span><div style="font-weight:600;color:var(--text-primary);margin-top:2px">${esc(c.cliente_nombre || '—')}</div></div>
+            <div><span style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px">CUIL</span><div style="color:var(--text-primary);margin-top:2px">${esc(c.cliente_cuil || '—')}</div></div>
+            <div><span style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px">Moto</span><div style="color:var(--text-primary);margin-top:2px">${esc(motoDesc)}</div></div>
+            <div><span style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px">Inicio</span><div style="color:var(--text-primary);margin-top:2px;font-variant-numeric:tabular-nums">${fmtDate(c.fecha_inicio)}</div></div>
+            <div><span style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px">Fin</span><div style="color:var(--text-primary);margin-top:2px;font-variant-numeric:tabular-nums">${fechaFin}</div></div>
+            <div><span style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px">Cuotas</span><div style="font-weight:600;color:var(--text-primary);margin-top:2px">${cuotaActual}/${plazo}</div></div>
+            <div><span style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px">Monto Cuota</span><div style="font-weight:600;color:var(--text-primary);margin-top:2px;font-variant-numeric:tabular-nums">${fmtMoney(c.valor_cuota)}</div></div>
+            <div><span style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px">Estado</span><div style="margin-top:2px"><span class="pill ${color}">${estadoContratoLabel[c.estado] || c.estado}</span></div></div>
+          </div>
+        </div>`;
+      }).join('');
+    } else {
+      cardsEl.innerHTML = '<div style="text-align:center;color:var(--text-secondary);padding:40px">Sin contratos de alquiler</div>';
+    }
     loading.style.display = 'none'; wrap.style.display = 'block';
   } catch (e) { console.error('Panel alquiler error:', e); }
 }
@@ -2685,7 +2811,29 @@ async function cargarPagos(estado, btnEl) {
     const params = {};
     if (estado) params.p_estado = estado;
     const data = await rpc('fn_listar_pagos', params);
-    const list = Array.isArray(data) ? data : [];
+    let list = Array.isArray(data) ? data : [];
+    // Sort pendientes by fecha_pago (nearest first)
+    if (estado === 'pendiente') {
+      list.sort((a, b) => (a.fecha_pago || '').localeCompare(b.fecha_pago || ''));
+    }
+    // 24h alert panel — check pending payments due within 24h
+    const alertPanel = document.getElementById('alertasCuotas24h');
+    const alertBody = document.getElementById('alertasCuotasBody');
+    if (estado === 'pendiente' || !estado) {
+      const now = new Date();
+      const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+      const pendientes24h = list.filter(p => {
+        if (p.estado_pago !== 'pendiente' || !p.fecha_pago) return false;
+        const fp = new Date(p.fecha_pago + 'T23:59:59');
+        return fp >= now && fp <= in24h;
+      });
+      if (pendientes24h.length) {
+        alertBody.innerHTML = pendientes24h.map(p =>
+          `<div style="padding:3px 0">🔔 <strong>${esc(p.cliente_nombre || '—')}</strong> — ${fmtMoney(p.monto)} — vence ${fmtDate(p.fecha_pago)}</div>`
+        ).join('');
+        alertPanel.style.display = 'block';
+      } else { alertPanel.style.display = 'none'; }
+    } else { alertPanel.style.display = 'none'; }
     body.innerHTML = list.length ? list.map(p => `<tr>
       <td>${fmtDate(p.fecha_pago)}</td>
       <td>${esc(p.contrato_id?.substring(0,8) || '—')}</td>
