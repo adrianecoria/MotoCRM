@@ -1,0 +1,1754 @@
+<title>MotoGest CRM</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+
+<style>
+/* ── Layout: sidebar + main panel, collapsing to bottom-nav on mobile ── */
+:root {
+  --bg-base: #0b0c10;
+  --bg-surface: #13141b;
+  --bg-elevated: #1a1b24;
+  --bg-hover: #22232e;
+  --border: #2a2b38;
+  --border-glow: rgba(99,102,241,0.25);
+  --text-primary: #e8e9ed;
+  --text-secondary: #8b8d9a;
+  --text-muted: #5c5e6b;
+  --accent: #6366f1;
+  --accent-glow: rgba(99,102,241,0.35);
+  --accent-soft: rgba(99,102,241,0.12);
+  --gradient-1: linear-gradient(135deg,#6366f1,#8b5cf6);
+  --gradient-2: linear-gradient(135deg,#06b6d4,#3b82f6);
+  --gradient-3: linear-gradient(135deg,#f59e0b,#ef4444);
+  --gradient-gps: linear-gradient(135deg,#10b981,#06b6d4);
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+  color-scheme: dark;
+}
+/* Force dark — this is a deliberately single-theme dark SaaS design */
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  padding-left: max(0px, env(safe-area-inset-left, 0px));
+  padding-right: max(0px, env(safe-area-inset-right, 0px));
+}
+*,*::before,*::after { box-sizing: border-box; }
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 0;
+  z-index: 20;
+}
+.sidebar-logo {
+  padding: 20px 20px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo .logo-icon {
+  width: 36px; height: 36px;
+  background: var(--gradient-1);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 700; color: #fff;
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+.sidebar-logo h1 {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 700; margin: 0; letter-spacing: -0.02em;
+}
+.sidebar-logo span { color: var(--text-secondary); font-size: 11px; display: block; margin-top: 2px; }
+
+.sidebar-section { padding: 16px 12px 8px; }
+.sidebar-section-title {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 0 8px;
+  margin-bottom: 6px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--text-secondary);
+  font-size: 13px; font-weight: 500;
+  position: relative;
+}
+.nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+.nav-item.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  box-shadow: 0 0 0 1px var(--border-glow);
+}
+.nav-item .nav-icon { width: 20px; text-align: center; font-size: 15px; flex-shrink: 0; }
+.nav-item .badge {
+  margin-left: auto;
+  background: var(--danger);
+  color: #fff;
+  font-size: 10px; font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 20px; text-align: center;
+}
+.nav-item .badge-info {
+  margin-left: auto;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 10px; font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+/* Sector indicators */
+.sector-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  flex-shrink: 0;
+}
+.sector-dot.s1 { background: var(--accent); box-shadow: 0 0 6px var(--accent-glow); }
+.sector-dot.s2 { background: #3b82f6; box-shadow: 0 0 6px rgba(59,130,246,0.35); }
+.sector-dot.s3 { background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,0.35); }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px;
+  border-top: 1px solid var(--border);
+}
+.user-info {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.user-info:hover { background: var(--bg-hover); }
+.user-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--gradient-1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #fff;
+}
+.user-info .user-details { min-width: 0; }
+.user-info .user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-info .user-role { font-size: 11px; color: var(--text-secondary); }
+
+/* ── Main content ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+.topbar {
+  height: 56px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  flex-shrink: 0;
+}
+.topbar-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.topbar-search {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  min-width: 200px;
+  cursor: pointer;
+}
+.topbar-search:hover { border-color: var(--border-glow); }
+.topbar-actions { display: flex; gap: 8px; }
+.topbar-btn {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 16px;
+  position: relative;
+}
+.topbar-btn:hover { border-color: var(--border-glow); color: var(--text-primary); }
+.topbar-btn .notif-dot {
+  position: absolute; top: 6px; right: 6px;
+  width: 7px; height: 7px;
+  background: var(--danger);
+  border-radius: 50%;
+  border: 2px solid var(--bg-surface);
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: var(--border-glow); }
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.card-subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+/* ── Stat tiles ── */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.stat-card.s1::before { background: var(--gradient-1); }
+.stat-card.s2::before { background: var(--gradient-2); }
+.stat-card.s3::before { background: var(--gradient-gps); }
+.stat-card.warn::before { background: var(--gradient-3); }
+.stat-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500; }
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.stat-delta {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 600;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+.stat-delta.up { color: var(--success); background: rgba(16,185,129,0.1); }
+.stat-delta.down { color: var(--danger); background: rgba(239,68,68,0.1); }
+
+/* ── Grids ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+
+/* ── Tables ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(42,43,56,0.5);
+  white-space: nowrap;
+}
+tbody tr:hover { background: var(--bg-hover); }
+
+/* ── Status pills ── */
+.pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.pill.green { background: rgba(16,185,129,0.12); color: var(--success); }
+.pill.red { background: rgba(239,68,68,0.12); color: var(--danger); }
+.pill.yellow { background: rgba(245,158,11,0.12); color: var(--warning); }
+.pill.blue { background: rgba(59,130,246,0.12); color: var(--info); }
+.pill.purple { background: var(--accent-soft); color: var(--accent); }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+  font-family: var(--font-body);
+}
+.btn-primary {
+  background: var(--gradient-1);
+  color: #fff;
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+.btn-primary:hover { box-shadow: 0 0 30px var(--accent-glow); transform: translateY(-1px); }
+.btn-secondary {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { border-color: var(--border-glow); }
+.btn-danger {
+  background: rgba(239,68,68,0.12);
+  color: var(--danger);
+  border: 1px solid rgba(239,68,68,0.2);
+}
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+
+/* ── Charts (inline SVG) ── */
+.chart-container { position: relative; width: 100%; }
+.mini-chart { height: 120px; }
+.chart-label { font-size: 11px; fill: var(--text-secondary); font-family: var(--font-body); }
+.chart-value { font-size: 11px; fill: var(--text-primary); font-family: var(--font-body); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ── Alerts row ── */
+.alert-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid;
+  background: var(--bg-elevated);
+  margin-bottom: 8px;
+}
+.alert-item.critical { border-left-color: var(--danger); }
+.alert-item.warning { border-left-color: var(--warning); }
+.alert-item.info { border-left-color: var(--info); }
+.alert-item .alert-icon { font-size: 16px; flex-shrink: 0; }
+.alert-item .alert-text { font-size: 13px; min-width: 0; }
+.alert-item .alert-time { font-size: 11px; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+
+/* ── GPS Map placeholder ── */
+.map-container {
+  background: var(--bg-elevated);
+  border-radius: var(--radius);
+  height: 400px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.map-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(99,102,241,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,102,241,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.map-dot {
+  position: absolute;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--bg-elevated);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.map-dot:hover { transform: scale(1.4); z-index: 5; }
+.map-dot.active { background: var(--success); box-shadow: 0 0 12px rgba(16,185,129,0.5); }
+.map-dot.stopped { background: var(--warning); box-shadow: 0 0 12px rgba(245,158,11,0.3); }
+.map-dot.alert { background: var(--danger); box-shadow: 0 0 12px rgba(239,68,68,0.5); animation: pulse 1.5s infinite; }
+.map-dot.offline { background: var(--text-muted); }
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 12px rgba(239,68,68,0.5); }
+  50% { box-shadow: 0 0 24px rgba(239,68,68,0.8); }
+}
+
+.map-legend {
+  position: absolute; bottom: 16px; left: 16px;
+  background: rgba(19,20,27,0.92);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  display: flex; gap: 16px; font-size: 11px; color: var(--text-secondary);
+}
+.map-legend-item { display: flex; align-items: center; gap: 6px; }
+.map-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+.map-stats {
+  position: absolute; top: 16px; right: 16px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.map-stat-card {
+  background: rgba(19,20,27,0.92);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  min-width: 140px;
+}
+.map-stat-card .ms-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.map-stat-card .ms-value { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin-top: 2px; font-variant-numeric: tabular-nums; }
+
+/* ── Tabs ── */
+.tabs {
+  display: flex; gap: 4px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  margin-bottom: 20px;
+}
+.tab-btn {
+  padding: 7px 16px;
+  border-radius: var(--radius-xs);
+  font-size: 13px; font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 0.15s;
+  font-family: var(--font-body);
+  white-space: nowrap;
+}
+.tab-btn:hover { color: var(--text-primary); }
+.tab-btn.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  box-shadow: 0 0 0 1px var(--border-glow);
+}
+
+/* ── Form elements ── */
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+.form-input, .form-select {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: var(--font-body);
+  transition: border-color 0.15s;
+}
+.form-input:focus, .form-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.modal-overlay[hidden] { display: none !important; }
+.modal {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 560px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-header h2 { font-family: var(--font-display); font-size: 16px; font-weight: 600; margin: 0; }
+.modal-close {
+  width: 28px; height: 28px;
+  border-radius: var(--radius-xs);
+  background: none; border: 1px solid var(--border);
+  color: var(--text-secondary); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.modal-body { padding: 24px; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* ── Section views (hidden by default) ── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── Sparkline inline ── */
+.sparkline { display: inline-block; vertical-align: middle; }
+
+/* ── Progress bar ── */
+.progress-bar {
+  height: 6px; background: var(--bg-hover); border-radius: 3px; overflow: hidden;
+}
+.progress-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+.progress-fill.green { background: var(--success); }
+.progress-fill.yellow { background: var(--warning); }
+.progress-fill.red { background: var(--danger); }
+.progress-fill.blue { background: var(--info); }
+.progress-fill.accent { background: var(--accent); }
+
+/* ── Scoring card ── */
+.score-ring {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 24px; font-weight: 700;
+  position: relative;
+}
+.score-ring::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 4px solid var(--bg-hover);
+}
+.score-ring.high { color: var(--success); }
+.score-ring.high::before { border-color: var(--success); border-top-color: transparent; }
+.score-ring.med { color: var(--warning); }
+.score-ring.med::before { border-color: var(--warning); border-top-color: transparent; }
+.score-ring.low { color: var(--danger); }
+.score-ring.low::before { border-color: var(--danger); border-top-color: transparent; border-right-color: transparent; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .mobile-nav {
+    display: flex !important;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    z-index: 50;
+    padding: 4px 8px;
+    padding-bottom: max(4px, env(safe-area-inset-bottom, 0px));
+    justify-content: space-around;
+  }
+  .content { padding-bottom: 72px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .topbar-search { display: none; }
+}
+.mobile-nav { display: none; }
+.mobile-nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 10px; font-weight: 600;
+  cursor: pointer;
+  border: none; background: none;
+  font-family: var(--font-body);
+}
+.mobile-nav-item.active { color: var(--accent); }
+.mobile-nav-item .mn-icon { font-size: 18px; }
+
+/* ── Timeline ── */
+.timeline-item {
+  display: flex; gap: 12px; padding: 12px 0;
+  border-bottom: 1px solid rgba(42,43,56,0.3);
+}
+.timeline-item:last-child { border-bottom: none; }
+.timeline-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+.timeline-content { min-width: 0; }
+.timeline-text { font-size: 13px; }
+.timeline-time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ── Contract detail panel ── */
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.detail-item { }
+.detail-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.detail-value { font-size: 14px; font-weight: 600; margin-top: 2px; font-variant-numeric: tabular-nums; }
+
+/* ── Inventory cards ── */
+.moto-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: all 0.2s;
+}
+.moto-card:hover { border-color: var(--border-glow); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.moto-img {
+  height: 140px;
+  background: var(--bg-elevated);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px;
+  position: relative;
+}
+.moto-img .moto-status {
+  position: absolute; top: 8px; right: 8px;
+}
+.moto-body { padding: 14px; }
+.moto-brand { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.moto-name { font-family: var(--font-display); font-size: 15px; font-weight: 600; margin-top: 2px; }
+.moto-specs { display: flex; gap: 12px; margin-top: 8px; font-size: 11px; color: var(--text-secondary); }
+.moto-price { font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-top: 10px; color: var(--accent); }
+.moto-price .moto-cost { font-size: 11px; color: var(--text-muted); font-weight: 400; display: block; font-family: var(--font-body); }
+</style>
+
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">M</div>
+    <div>
+      <h1>MotoGest</h1>
+      <span>CRM & Gestión Integral</span>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">General</div>
+    <div class="nav-item active" onclick="switchView('dashboard')">
+      <span class="nav-icon">📊</span> Dashboard Global
+    </div>
+    <div class="nav-item" onclick="switchView('crm')">
+      <span class="nav-icon">👤</span> CRM Unificado
+      <span class="badge-info">1.247</span>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Sector 1 — Alquiler</div>
+    <div class="nav-item" onclick="switchView('s1-dashboard')">
+      <span class="sector-dot s1"></span>
+      <span class="nav-icon">📋</span> Panel Alquiler
+      <span class="badge">5</span>
+    </div>
+    <div class="nav-item" onclick="switchView('s1-contratos')">
+      <span class="sector-dot s1"></span>
+      <span class="nav-icon">📄</span> Contratos
+    </div>
+    <div class="nav-item" onclick="switchView('s1-cobranza')">
+      <span class="sector-dot s1"></span>
+      <span class="nav-icon">💰</span> Cobranza
+    </div>
+    <div class="nav-item" onclick="switchView('s1-scoring')">
+      <span class="sector-dot s1"></span>
+      <span class="nav-icon">🔍</span> Scoring / KYC
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Sector 2 — Ventas</div>
+    <div class="nav-item" onclick="switchView('s2-dashboard')">
+      <span class="sector-dot s2"></span>
+      <span class="nav-icon">🏪</span> Panel Ventas
+    </div>
+    <div class="nav-item" onclick="switchView('s2-stock')">
+      <span class="sector-dot s2"></span>
+      <span class="nav-icon">🏍️</span> Inventario
+      <span class="badge-info">84</span>
+    </div>
+    <div class="nav-item" onclick="switchView('s2-simulador')">
+      <span class="sector-dot s2"></span>
+      <span class="nav-icon">🧮</span> Simulador Crédito
+    </div>
+    <div class="nav-item" onclick="switchView('s2-gestoria')">
+      <span class="sector-dot s2"></span>
+      <span class="nav-icon">📑</span> Gestoría / Trámites
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Sector 3 — GPS</div>
+    <div class="nav-item" onclick="switchView('s3-mapa')">
+      <span class="sector-dot s3"></span>
+      <span class="nav-icon">🗺️</span> Mapa en Vivo
+    </div>
+    <div class="nav-item" onclick="switchView('s3-suscripciones')">
+      <span class="sector-dot s3"></span>
+      <span class="nav-icon">📡</span> Suscripciones
+    </div>
+    <div class="nav-item" onclick="switchView('s3-alertas')">
+      <span class="sector-dot s3"></span>
+      <span class="nav-icon">🚨</span> Alertas / Pánico
+      <span class="badge">2</span>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Administración</div>
+    <div class="nav-item" onclick="switchView('contabilidad')">
+      <span class="nav-icon">📒</span> Contabilidad
+    </div>
+    <div class="nav-item" onclick="switchView('config')">
+      <span class="nav-icon">⚙️</span> Configuración
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-avatar">AC</div>
+      <div class="user-details">
+        <div class="user-name">Adrián Coria</div>
+        <div class="user-role">Administrador</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════════════ MAIN ═══════════════════ -->
+<div class="main">
+  <div class="topbar">
+    <button class="topbar-btn" style="display:none" id="menuToggle" onclick="toggleSidebar()">☰</button>
+    <div class="topbar-title" id="topbarTitle">Dashboard Global</div>
+    <div class="topbar-search">🔍 Buscar cliente, contrato, unidad...</div>
+    <div class="topbar-actions">
+      <button class="topbar-btn">🔔<span class="notif-dot"></span></button>
+      <button class="topbar-btn">💬</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══ DASHBOARD GLOBAL ═══ -->
+    <div class="view active" id="view-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card s1">
+          <div class="stat-label">Alquileres Activos</div>
+          <div class="stat-value">127</div>
+          <div class="stat-delta up">▲ 12% vs. mes ant.</div>
+        </div>
+        <div class="stat-card s2">
+          <div class="stat-label">Ventas del Mes</div>
+          <div class="stat-value">34</div>
+          <div class="stat-delta up">▲ 8% vs. mes ant.</div>
+        </div>
+        <div class="stat-card s3">
+          <div class="stat-label">Dispositivos GPS Activos</div>
+          <div class="stat-value">312</div>
+          <div class="stat-delta up">▲ 15% vs. mes ant.</div>
+        </div>
+        <div class="stat-card warn">
+          <div class="stat-label">Cuotas Vencidas Hoy</div>
+          <div class="stat-value">5</div>
+          <div class="stat-delta down">▼ Requiere atención</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Ingresos por Sector — Últimos 6 Meses</div>
+              <div class="card-subtitle">En miles de ARS</div>
+            </div>
+          </div>
+          <div class="chart-container">
+            <svg viewBox="0 0 500 200" style="width:100%;height:auto">
+              <defs>
+                <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6366f1" stop-opacity="0.15"/><stop offset="100%" stop-color="#6366f1" stop-opacity="0"/></linearGradient>
+                <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3b82f6" stop-opacity="0.15"/><stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/></linearGradient>
+                <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#10b981" stop-opacity="0.15"/><stop offset="100%" stop-color="#10b981" stop-opacity="0"/></linearGradient>
+              </defs>
+              <!-- Grid -->
+              <line x1="60" y1="20" x2="60" y2="170" stroke="#2a2b38" stroke-width="1"/>
+              <line x1="60" y1="170" x2="480" y2="170" stroke="#2a2b38" stroke-width="1"/>
+              <line x1="60" y1="132" x2="480" y2="132" stroke="#2a2b38" stroke-width="1" stroke-dasharray="0"/>
+              <line x1="60" y1="95" x2="480" y2="95" stroke="#2a2b38" stroke-width="1"/>
+              <line x1="60" y1="57" x2="480" y2="57" stroke="#2a2b38" stroke-width="1"/>
+              <line x1="60" y1="20" x2="480" y2="20" stroke="#2a2b38" stroke-width="1"/>
+              <!-- Y labels -->
+              <text x="52" y="174" text-anchor="end" class="chart-label">0</text>
+              <text x="52" y="136" text-anchor="end" class="chart-label">500</text>
+              <text x="52" y="99" text-anchor="end" class="chart-label">1.000</text>
+              <text x="52" y="61" text-anchor="end" class="chart-label">1.500</text>
+              <text x="52" y="24" text-anchor="end" class="chart-label">2.000</text>
+              <!-- X labels -->
+              <text x="130" y="188" text-anchor="middle" class="chart-label">Jun</text>
+              <text x="200" y="188" text-anchor="middle" class="chart-label">Jul</text>
+              <text x="270" y="188" text-anchor="middle" class="chart-label">Ago</text>
+              <text x="340" y="188" text-anchor="middle" class="chart-label">Sep</text>
+              <text x="410" y="188" text-anchor="middle" class="chart-label">Oct</text>
+              <text x="480" y="188" text-anchor="middle" class="chart-label">Nov</text>
+              <!-- Alquiler line -->
+              <path d="M130,120 L200,108 L270,95 L340,82 L410,70 L480,55" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M130,120 L200,108 L270,95 L340,82 L410,70 L480,55 L480,170 L130,170Z" fill="url(#g1)"/>
+              <circle cx="480" cy="55" r="4" fill="#6366f1" stroke="#13141b" stroke-width="2"/>
+              <text x="472" y="48" class="chart-value" text-anchor="end">1.920K</text>
+              <!-- Ventas line -->
+              <path d="M130,140 L200,130 L270,138 L340,120 L410,110 L480,95" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M130,140 L200,130 L270,138 L340,120 L410,110 L480,95 L480,170 L130,170Z" fill="url(#g2)"/>
+              <circle cx="480" cy="95" r="4" fill="#3b82f6" stroke="#13141b" stroke-width="2"/>
+              <text x="472" y="90" class="chart-value" text-anchor="end">1.050K</text>
+              <!-- GPS line -->
+              <path d="M130,155 L200,148 L270,142 L340,135 L410,125 L480,115" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M130,155 L200,148 L270,142 L340,135 L410,125 L480,115 L480,170 L130,170Z" fill="url(#g3)"/>
+              <circle cx="480" cy="115" r="4" fill="#10b981" stroke="#13141b" stroke-width="2"/>
+              <text x="472" y="112" class="chart-value" text-anchor="end">780K</text>
+            </svg>
+            <div style="display:flex; gap:20px; justify-content:center; padding:8px 0 0; font-size:12px; color:var(--text-secondary)">
+              <span><span style="display:inline-block;width:10px;height:3px;background:#6366f1;border-radius:2px;margin-right:6px;vertical-align:middle"></span>Alquiler</span>
+              <span><span style="display:inline-block;width:10px;height:3px;background:#3b82f6;border-radius:2px;margin-right:6px;vertical-align:middle"></span>Ventas</span>
+              <span><span style="display:inline-block;width:10px;height:3px;background:#10b981;border-radius:2px;margin-right:6px;vertical-align:middle"></span>GPS</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Alertas Prioritarias</div>
+            <span class="pill red">5 pendientes</span>
+          </div>
+          <div class="alert-item critical">
+            <span class="alert-icon">🔴</span>
+            <div class="alert-text"><strong>Mora extrema:</strong> Contrato #A-0892 — Rodríguez, Martín — 45 días sin pago</div>
+            <span class="alert-time">Hace 2h</span>
+          </div>
+          <div class="alert-item critical">
+            <span class="alert-icon">🚨</span>
+            <div class="alert-text"><strong>Botón de pánico:</strong> Dispositivo GPS-1847 activado — Honda CB190R</div>
+            <span class="alert-time">Hace 15m</span>
+          </div>
+          <div class="alert-item warning">
+            <span class="alert-icon">⚠️</span>
+            <div class="alert-text"><strong>Geocerca violada:</strong> Moto ID-4521 fuera de zona — Bajaj Dominar</div>
+            <span class="alert-time">Hace 1h</span>
+          </div>
+          <div class="alert-item warning">
+            <span class="alert-icon">⏰</span>
+            <div class="alert-text"><strong>Service vencido:</strong> 3 unidades superaron los 2.500 km sin mantenimiento</div>
+            <span class="alert-time">Hoy</span>
+          </div>
+          <div class="alert-item info">
+            <span class="alert-icon">📋</span>
+            <div class="alert-text"><strong>Contrato por vencer:</strong> #A-0756 opción de compra disponible en 7 días</div>
+            <span class="alert-time">Hoy</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Morosidad (PAR)</div></div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>PAR 1-30 días</span><span style="font-weight:600;color:var(--warning)">8.2%</span></div>
+              <div class="progress-bar"><div class="progress-fill yellow" style="width:8.2%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>PAR 30-60 días</span><span style="font-weight:600;color:var(--danger)">3.5%</span></div>
+              <div class="progress-bar"><div class="progress-fill red" style="width:3.5%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>PAR 60+ días</span><span style="font-weight:600;color:var(--danger)">1.8%</span></div>
+              <div class="progress-bar"><div class="progress-fill red" style="width:1.8%"></div></div>
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Tasa total de morosidad: 13.5% — Meta: ≤10%</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Stock por Estado</div></div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>En salón</span><span style="font-weight:600">42</span></div>
+              <div class="progress-bar"><div class="progress-fill accent" style="width:50%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Reservada</span><span style="font-weight:600">12</span></div>
+              <div class="progress-bar"><div class="progress-fill blue" style="width:14%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>En trámite</span><span style="font-weight:600">8</span></div>
+              <div class="progress-bar"><div class="progress-fill yellow" style="width:9.5%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Vendida (mes)</span><span style="font-weight:600">22</span></div>
+              <div class="progress-bar"><div class="progress-fill green" style="width:26%"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">GPS — Estado de Flota</div></div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>En movimiento</span><span style="font-weight:600;color:var(--success)">187</span></div>
+              <div class="progress-bar"><div class="progress-fill green" style="width:60%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Detenida</span><span style="font-weight:600">98</span></div>
+              <div class="progress-bar"><div class="progress-fill yellow" style="width:31%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Sin señal</span><span style="font-weight:600;color:var(--danger)">15</span></div>
+              <div class="progress-bar"><div class="progress-fill red" style="width:5%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Alarma activa</span><span style="font-weight:600;color:var(--danger)">2</span></div>
+              <div class="progress-bar"><div class="progress-fill red" style="width:0.6%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CRM UNIFICADO ═══ -->
+    <div class="view" id="view-crm">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div class="tabs">
+          <button class="tab-btn active">Todos</button>
+          <button class="tab-btn">Alquiler</button>
+          <button class="tab-btn">Compra</button>
+          <button class="tab-btn">GPS</button>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modalCliente')">+ Nuevo Cliente</button>
+      </div>
+      <div class="card" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>DNI / CUIT</th><th>Nombre Completo</th><th>Teléfono</th><th>Scoring</th><th>Sectores</th><th>Estado</th><th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-variant-numeric:tabular-nums">32.456.789</td>
+                <td><strong>Rodríguez, Martín</strong></td>
+                <td>+54 11 4567-8901</td>
+                <td><span class="pill red">● 320</span></td>
+                <td><span class="pill purple">Alquiler</span> <span class="pill blue">GPS</span></td>
+                <td><span class="pill red">En mora</span></td>
+                <td><button class="btn btn-secondary btn-sm">Ver ficha</button></td>
+              </tr>
+              <tr>
+                <td style="font-variant-numeric:tabular-nums">28.901.234</td>
+                <td><strong>González, María Laura</strong></td>
+                <td>+54 11 5678-2345</td>
+                <td><span class="pill green">● 780</span></td>
+                <td><span class="pill purple">Alquiler</span> <span class="pill blue">GPS</span></td>
+                <td><span class="pill green">Al día</span></td>
+                <td><button class="btn btn-secondary btn-sm">Ver ficha</button></td>
+              </tr>
+              <tr>
+                <td style="font-variant-numeric:tabular-nums">35.678.012</td>
+                <td><strong>Fernández, Lucas</strong></td>
+                <td>+54 11 6789-3456</td>
+                <td><span class="pill green">● 850</span></td>
+                <td><span class="pill blue" style="background:rgba(59,130,246,0.12)">Compra</span> <span class="pill blue">GPS</span></td>
+                <td><span class="pill green">Al día</span></td>
+                <td><button class="btn btn-secondary btn-sm">Ver ficha</button></td>
+              </tr>
+              <tr>
+                <td style="font-variant-numeric:tabular-nums">40.123.456</td>
+                <td><strong>Díaz, Valentina</strong></td>
+                <td>+54 11 3456-7890</td>
+                <td><span class="pill yellow">● 520</span></td>
+                <td><span class="pill purple">Alquiler</span></td>
+                <td><span class="pill yellow">Riesgo medio</span></td>
+                <td><button class="btn btn-secondary btn-sm">Ver ficha</button></td>
+              </tr>
+              <tr>
+                <td style="font-variant-numeric:tabular-nums">27.890.567</td>
+                <td><strong>López, Santiago</strong></td>
+                <td>+54 11 7890-1234</td>
+                <td><span class="pill green">● 910</span></td>
+                <td><span class="pill blue" style="background:rgba(59,130,246,0.12)">Compra</span></td>
+                <td><span class="pill green">Al día</span></td>
+                <td><button class="btn btn-secondary btn-sm">Ver ficha</button></td>
+              </tr>
+              <tr>
+                <td style="font-variant-numeric:tabular-nums">33.456.123</td>
+                <td><strong>Martínez, Camila</strong></td>
+                <td>+54 11 2345-6789</td>
+                <td><span class="pill green">● 720</span></td>
+                <td><span class="pill blue">GPS</span></td>
+                <td><span class="pill green">Al día</span></td>
+                <td><button class="btn btn-secondary btn-sm">Ver ficha</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SECTOR 1: PANEL ALQUILER ═══ -->
+    <div class="view" id="view-s1-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card s1"><div class="stat-label">Contratos Activos</div><div class="stat-value">127</div><div class="stat-delta up">▲ 12 este mes</div></div>
+        <div class="stat-card s1"><div class="stat-label">Cuotas Cobradas (Mes)</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$4.280.000</div><div class="stat-delta up">▲ 92% cobrado</div></div>
+        <div class="stat-card warn"><div class="stat-label">Mora Total Acumulada</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$890.000</div><div class="stat-delta down">▼ 5 contratos</div></div>
+        <div class="stat-card s1"><div class="stat-label">Opción Compra Próx.</div><div class="stat-value">8</div><div class="stat-delta up">Próx. 30 días</div></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Cuotas Vencidas Hoy</div></div>
+          <div class="alert-item critical">
+            <span class="alert-icon">🔴</span>
+            <div class="alert-text"><strong>#A-0892</strong> — Rodríguez, Martín<br><span style="font-size:11px;color:var(--text-muted)">Honda CB190R · Cuota 8/24 · $45.000 · 45 días</span></div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <button class="btn btn-danger btn-sm">Corte motor</button>
+              <button class="btn btn-secondary btn-sm">WhatsApp</button>
+            </div>
+          </div>
+          <div class="alert-item warning">
+            <span class="alert-icon">⚠️</span>
+            <div class="alert-text"><strong>#A-1023</strong> — Pérez, Juan<br><span style="font-size:11px;color:var(--text-muted)">Bajaj Dominar 250 · Cuota 3/18 · $52.000 · 8 días</span></div>
+            <div><button class="btn btn-secondary btn-sm">WhatsApp</button></div>
+          </div>
+          <div class="alert-item warning">
+            <span class="alert-icon">⚠️</span>
+            <div class="alert-text"><strong>#A-1105</strong> — Ramírez, Sol<br><span style="font-size:11px;color:var(--text-muted)">TVS Apache 200 · Cuota 5/12 · $38.000 · 3 días</span></div>
+            <div><button class="btn btn-secondary btn-sm">WhatsApp</button></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Flujo de Caja Proyectado (Alquileres)</div></div>
+          <svg viewBox="0 0 440 180" style="width:100%;height:auto">
+            <line x1="40" y1="160" x2="420" y2="160" stroke="#2a2b38" stroke-width="1"/>
+            <line x1="40" y1="120" x2="420" y2="120" stroke="#2a2b38" stroke-width="1"/>
+            <line x1="40" y1="80" x2="420" y2="80" stroke="#2a2b38" stroke-width="1"/>
+            <line x1="40" y1="40" x2="420" y2="40" stroke="#2a2b38" stroke-width="1"/>
+            <text x="35" y="164" text-anchor="end" class="chart-label">0</text>
+            <text x="35" y="124" text-anchor="end" class="chart-label">2M</text>
+            <text x="35" y="84" text-anchor="end" class="chart-label">4M</text>
+            <text x="35" y="44" text-anchor="end" class="chart-label">6M</text>
+            <!-- Bars -->
+            <rect x="65" y="68" width="20" height="92" rx="4" ry="4" fill="#6366f1" opacity="0.85"/>
+            <text x="75" y="158" text-anchor="middle" class="chart-label">Nov</text>
+            <rect x="125" y="60" width="20" height="100" rx="4" ry="4" fill="#6366f1" opacity="0.85"/>
+            <text x="135" y="158" text-anchor="middle" class="chart-label">Dic</text>
+            <rect x="185" y="72" width="20" height="88" rx="4" ry="4" fill="#6366f1" opacity="0.6"/>
+            <text x="195" y="158" text-anchor="middle" class="chart-label">Ene</text>
+            <rect x="245" y="75" width="20" height="85" rx="4" ry="4" fill="#6366f1" opacity="0.5"/>
+            <text x="255" y="158" text-anchor="middle" class="chart-label">Feb</text>
+            <rect x="305" y="80" width="20" height="80" rx="4" ry="4" fill="#6366f1" opacity="0.4"/>
+            <text x="315" y="158" text-anchor="middle" class="chart-label">Mar</text>
+            <rect x="365" y="78" width="20" height="82" rx="4" ry="4" fill="#6366f1" opacity="0.35"/>
+            <text x="375" y="158" text-anchor="middle" class="chart-label">Abr</text>
+            <text x="75" y="62" text-anchor="middle" class="chart-value">4.6M</text>
+            <text x="135" y="54" text-anchor="middle" class="chart-value">5.0M</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Mantenimientos Preventivos Pendientes</div>
+          <span class="pill yellow">3 vencidos</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Unidad</th><th>Contrato</th><th>Km Actual</th><th>Próx. Service</th><th>Estado</th><th>Acción</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Honda CB190R — AB123CD</td><td>#A-0892</td><td style="font-variant-numeric:tabular-nums">7.820 km</td><td style="font-variant-numeric:tabular-nums">7.500 km</td><td><span class="pill red">Vencido</span></td><td><button class="btn btn-secondary btn-sm">Avisar por WA</button></td>
+              </tr>
+              <tr>
+                <td>Yamaha FZ25 — CD456EF</td><td>#A-0934</td><td style="font-variant-numeric:tabular-nums">5.100 km</td><td style="font-variant-numeric:tabular-nums">5.000 km</td><td><span class="pill red">Vencido</span></td><td><button class="btn btn-secondary btn-sm">Avisar por WA</button></td>
+              </tr>
+              <tr>
+                <td>Bajaj Dominar 250 — EF789GH</td><td>#A-1023</td><td style="font-variant-numeric:tabular-nums">4.200 km</td><td style="font-variant-numeric:tabular-nums">5.000 km</td><td><span class="pill green">OK (800 km rest.)</span></td><td>—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SECTOR 1: CONTRATOS ═══ -->
+    <div class="view" id="view-s1-contratos">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div class="tabs">
+          <button class="tab-btn active">Activos</button>
+          <button class="tab-btn">Finalizados</button>
+          <button class="tab-btn">En mora</button>
+          <button class="tab-btn">Opción compra</button>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modalContrato')">+ Nuevo Contrato</button>
+      </div>
+      <div class="card" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Cliente</th><th>Unidad</th><th>Inicio</th><th>Plazo</th><th>Cuota</th><th>Cuotas Pagas</th><th>Estado</th><th>Residual</th></tr></thead>
+            <tbody>
+              <tr><td>A-0756</td><td>González, M.L.</td><td>Honda Wave 110</td><td>01/02/2025</td><td>12 meses</td><td style="font-variant-numeric:tabular-nums">$32.000</td><td>10/12</td><td><span class="pill green">Al día</span></td><td style="font-variant-numeric:tabular-nums">$180.000</td></tr>
+              <tr><td>A-0892</td><td>Rodríguez, M.</td><td>Honda CB190R</td><td>15/04/2025</td><td>24 meses</td><td style="font-variant-numeric:tabular-nums">$45.000</td><td>5/24</td><td><span class="pill red">Mora 45d</span></td><td style="font-variant-numeric:tabular-nums">$450.000</td></tr>
+              <tr><td>A-0934</td><td>Torres, Facundo</td><td>Yamaha FZ25</td><td>01/06/2025</td><td>18 meses</td><td style="font-variant-numeric:tabular-nums">$58.000</td><td>5/18</td><td><span class="pill green">Al día</span></td><td style="font-variant-numeric:tabular-nums">$520.000</td></tr>
+              <tr><td>A-1023</td><td>Pérez, Juan</td><td>Bajaj Dominar 250</td><td>01/08/2025</td><td>18 meses</td><td style="font-variant-numeric:tabular-nums">$52.000</td><td>2/18</td><td><span class="pill yellow">Mora 8d</span></td><td style="font-variant-numeric:tabular-nums">$580.000</td></tr>
+              <tr><td>A-1105</td><td>Ramírez, Sol</td><td>TVS Apache 200</td><td>15/09/2025</td><td>12 meses</td><td style="font-variant-numeric:tabular-nums">$38.000</td><td>1/12</td><td><span class="pill yellow">Mora 3d</span></td><td style="font-variant-numeric:tabular-nums">$290.000</td></tr>
+              <tr><td>A-1148</td><td>Acosta, Lara</td><td>Zanella ZR 200</td><td>01/10/2025</td><td>24 meses</td><td style="font-variant-numeric:tabular-nums">$35.000</td><td>1/24</td><td><span class="pill green">Al día</span></td><td style="font-variant-numeric:tabular-nums">$380.000</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SECTOR 1: COBRANZA ═══ -->
+    <div class="view" id="view-s1-cobranza">
+      <div class="stats-grid">
+        <div class="stat-card s1"><div class="stat-label">Total Facturado (Mes)</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$5.715.000</div></div>
+        <div class="stat-card s1"><div class="stat-label">Total Cobrado</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$4.280.000</div><div class="stat-delta up">74.9%</div></div>
+        <div class="stat-card warn"><div class="stat-label">Pendiente de Cobro</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$1.435.000</div></div>
+        <div class="stat-card s1"><div class="stat-label">Intereses Moratorios</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$142.800</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Movimientos de Cobranza Recientes</div>
+          <div class="tabs" style="margin-bottom:0">
+            <button class="tab-btn active">Todos</button>
+            <button class="tab-btn">Automáticos</button>
+            <button class="tab-btn">Manuales</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Fecha</th><th>Contrato</th><th>Cliente</th><th>Monto</th><th>Método</th><th>Estado</th><th>Recibo</th></tr></thead>
+            <tbody>
+              <tr><td>05/11/2026</td><td>A-0934</td><td>Torres, Facundo</td><td style="font-variant-numeric:tabular-nums">$58.000</td><td>Transferencia (webhook)</td><td><span class="pill green">Acreditado</span></td><td><button class="btn btn-secondary btn-sm">PDF</button></td></tr>
+              <tr><td>05/11/2026</td><td>A-1148</td><td>Acosta, Lara</td><td style="font-variant-numeric:tabular-nums">$35.000</td><td>MercadoPago</td><td><span class="pill green">Acreditado</span></td><td><button class="btn btn-secondary btn-sm">PDF</button></td></tr>
+              <tr><td>04/11/2026</td><td>A-0756</td><td>González, M.L.</td><td style="font-variant-numeric:tabular-nums">$32.000</td><td>Débito CBU</td><td><span class="pill green">Acreditado</span></td><td><button class="btn btn-secondary btn-sm">PDF</button></td></tr>
+              <tr><td>03/11/2026</td><td>A-1023</td><td>Pérez, Juan</td><td style="font-variant-numeric:tabular-nums">$52.000</td><td>—</td><td><span class="pill red">Rechazado</span></td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SECTOR 1: SCORING / KYC ═══ -->
+    <div class="view" id="view-s1-scoring">
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-header"><div class="card-title">Motor de Scoring Automatizado</div><div class="card-subtitle">Validación de identidad y antecedentes antes de entregar la unidad</div></div>
+        <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px"><label class="form-label">DNI del solicitante</label><input class="form-input" placeholder="Ej: 32456789" id="scoringDni"></div>
+          <div style="flex:1;min-width:200px"><label class="form-label">CUIT (opcional)</label><input class="form-input" placeholder="Ej: 20-32456789-4"></div>
+          <div style="padding-top:20px"><button class="btn btn-primary" onclick="runScoring()">Consultar Scoring</button></div>
+        </div>
+      </div>
+      <div id="scoringResult" hidden>
+        <div class="grid-3">
+          <div class="card" style="text-align:center">
+            <div class="card-title" style="margin-bottom:12px">Score Crediticio</div>
+            <div class="score-ring high" style="margin:0 auto" id="scoreRing">780</div>
+            <div style="margin-top:8px;font-size:12px;color:var(--success);font-weight:600" id="scoreLabel">Riesgo bajo — Aprobado</div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px">Validaciones</div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
+              <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--success)">✓</span> RENAPER — Identidad verificada</div>
+              <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--success)">✓</span> Veraz/Nosis — Sin deuda vigente</div>
+              <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--success)">✓</span> Registro conducir — Vigente</div>
+              <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--warning)">⚠</span> Servicio domiciliario — Pendiente</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px">Documentos KYC</div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
+              <div style="display:flex;justify-content:space-between"><span>Foto DNI frente</span><span class="pill green">✓</span></div>
+              <div style="display:flex;justify-content:space-between"><span>Foto DNI dorso</span><span class="pill green">✓</span></div>
+              <div style="display:flex;justify-content:space-between"><span>Selfie biométrica</span><span class="pill green">✓</span></div>
+              <div style="display:flex;justify-content:space-between"><span>Servicio a nombre</span><span class="pill yellow">Pend.</span></div>
+              <div style="display:flex;justify-content:space-between"><span>Registro conducir</span><span class="pill green">✓</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SECTOR 2: PANEL VENTAS ═══ -->
+    <div class="view" id="view-s2-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card s2"><div class="stat-label">Unidades Vendidas (Mes)</div><div class="stat-value">34</div><div class="stat-delta up">▲ 8 vs. oct.</div></div>
+        <div class="stat-card s2"><div class="stat-label">Facturación Bruta</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$42.5M</div><div class="stat-delta up">▲ 15%</div></div>
+        <div class="stat-card s2"><div class="stat-label">Margen Promedio</div><div class="stat-value">18.4%</div><div class="stat-delta up">▲ 1.2 pp</div></div>
+        <div class="stat-card s2"><div class="stat-label">Comisiones Generadas</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$780K</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Ventas por Modelo (Top 5)</div></div>
+          <svg viewBox="0 0 420 200" style="width:100%;height:auto">
+            <!-- Horizontal bars -->
+            <text x="115" y="35" text-anchor="end" class="chart-label" style="font-size:11px">Honda Wave 110</text>
+            <rect x="120" y="22" width="180" height="20" rx="4" fill="#3b82f6" opacity="0.85"/><text x="305" y="36" class="chart-value">12</text>
+            <text x="115" y="68" text-anchor="end" class="chart-label" style="font-size:11px">Bajaj Dominar 250</text>
+            <rect x="120" y="55" width="120" height="20" rx="4" fill="#3b82f6" opacity="0.7"/><text x="245" y="69" class="chart-value">8</text>
+            <text x="115" y="101" text-anchor="end" class="chart-label" style="font-size:11px">Yamaha FZ25</text>
+            <rect x="120" y="88" width="90" height="20" rx="4" fill="#3b82f6" opacity="0.6"/><text x="215" y="102" class="chart-value">6</text>
+            <text x="115" y="134" text-anchor="end" class="chart-label" style="font-size:11px">TVS Apache 200</text>
+            <rect x="120" y="121" width="60" height="20" rx="4" fill="#3b82f6" opacity="0.5"/><text x="185" y="135" class="chart-value">4</text>
+            <text x="115" y="167" text-anchor="end" class="chart-label" style="font-size:11px">Honda CB190R</text>
+            <rect x="120" y="154" width="60" height="20" rx="4" fill="#3b82f6" opacity="0.4"/><text x="185" y="168" class="chart-value">4</text>
+          </svg>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Comisiones por Vendedor</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Vendedor</th><th>Ventas</th><th>Margen Real</th><th>Comisión</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Sánchez, Pablo</strong></td><td>12</td><td style="font-variant-numeric:tabular-nums">$3.240.000</td><td style="font-variant-numeric:tabular-nums;color:var(--success)">$324.000</td></tr>
+                <tr><td><strong>Méndez, Carolina</strong></td><td>10</td><td style="font-variant-numeric:tabular-nums">$2.680.000</td><td style="font-variant-numeric:tabular-nums;color:var(--success)">$268.000</td></tr>
+                <tr><td><strong>Rojas, Damián</strong></td><td>8</td><td style="font-variant-numeric:tabular-nums">$1.920.000</td><td style="font-variant-numeric:tabular-nums;color:var(--success)">$192.000</td></tr>
+                <tr><td><strong>Vega, Florencia</strong></td><td>4</td><td style="font-variant-numeric:tabular-nums">$890.000</td><td style="font-variant-numeric:tabular-nums;color:var(--success)">$89.000</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SECTOR 2: INVENTARIO ═══ -->
+    <div class="view" id="view-s2-stock">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div class="tabs">
+          <button class="tab-btn active">Todos (84)</button>
+          <button class="tab-btn">En salón (42)</button>
+          <button class="tab-btn">Reservadas (12)</button>
+          <button class="tab-btn">En trámite (8)</button>
+        </div>
+        <button class="btn btn-primary">+ Cargar Unidad</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">
+        <div class="moto-card">
+          <div class="moto-img">🏍️<div class="moto-status"><span class="pill green">En salón</span></div></div>
+          <div class="moto-body">
+            <div class="moto-brand">Honda</div>
+            <div class="moto-name">Wave 110 S</div>
+            <div class="moto-specs"><span>110cc</span><span>0 km</span><span>Negra</span></div>
+            <div class="moto-price">$1.850.000<span class="moto-cost">Costo: $1.520.000</span></div>
+          </div>
+        </div>
+        <div class="moto-card">
+          <div class="moto-img">🏍️<div class="moto-status"><span class="pill green">En salón</span></div></div>
+          <div class="moto-body">
+            <div class="moto-brand">Bajaj</div>
+            <div class="moto-name">Dominar 250</div>
+            <div class="moto-specs"><span>250cc</span><span>0 km</span><span>Blanca</span></div>
+            <div class="moto-price">$3.450.000<span class="moto-cost">Costo: $2.890.000</span></div>
+          </div>
+        </div>
+        <div class="moto-card">
+          <div class="moto-img">🏍️<div class="moto-status"><span class="pill blue">Reservada</span></div></div>
+          <div class="moto-body">
+            <div class="moto-brand">Yamaha</div>
+            <div class="moto-name">FZ 25</div>
+            <div class="moto-specs"><span>250cc</span><span>0 km</span><span>Azul</span></div>
+            <div class="moto-price">$4.200.000<span class="moto-cost">Costo: $3.560.000</span></div>
+          </div>
+        </div>
+        <div class="moto-card">
+          <div class="moto-img">🏍️<div class="moto-status"><span class="pill yellow">En trámite</span></div></div>
+          <div class="moto-body">
+            <div class="moto-brand">Honda</div>
+            <div class="moto-name">CB 190R</div>
+            <div class="moto-specs"><span>190cc</span><span>0 km</span><span>Roja</span></div>
+            <div class="moto-price">$3.100.000<span class="moto-cost">Costo: $2.580.000</span></div>
+          </div>
+        </div>
+        <div class="moto-card">
+          <div class="moto-img">🏍️<div class="moto-status"><span class="pill green">En salón</span></div></div>
+          <div class="moto-body">
+            <div class="moto-brand">TVS</div>
+            <div class="moto-name">Apache RTR 200</div>
+            <div class="moto-specs"><span>200cc</span><span>0 km</span><span>Negra</span></div>
+            <div class="moto-price">$2.780.000<span class="moto-cost">Costo: $2.290.000</span></div>
+          </div>
+        </div>
+        <div class="moto-card">
+          <div class="moto-img">🏍️<div class="moto-status"><span class="pill green">En salón</span></div></div>
+          <div class="moto-body">
+            <div class="moto-brand">Zanella</div>
+            <div class="moto-name">ZR 200 OHC</div>
+            <div class="moto-specs"><span>200cc</span><span>0 km</span><span>Gris</span></div>
+            <div class="moto-price">$1.950.000<span class="moto-cost">Costo: $1.610.000</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SECTOR 2: SIMULADOR DE CRÉDITO ═══ -->
+    <div class="view" id="view-s2-simulador">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Simulador de Financiación</div><div class="card-subtitle">Sistema Francés / Alemán</div></div>
+          <div class="form-group">
+            <label class="form-label">Valor del vehículo ($)</label>
+            <input class="form-input" type="text" value="3.450.000" id="simPrecio">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="form-group">
+              <label class="form-label">Anticipo (%)</label>
+              <input class="form-input" type="number" value="30" id="simAnticipo">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cuotas</label>
+              <select class="form-select" id="simCuotas">
+                <option>6</option><option>12</option><option selected>18</option><option>24</option><option>36</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="form-group">
+              <label class="form-label">TNA (%)</label>
+              <input class="form-input" type="number" value="85" id="simTna">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Sistema</label>
+              <select class="form-select" id="simSistema">
+                <option>Francés</option><option>Alemán</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" style="width:100%" onclick="calcularCredito()">Calcular Financiación</button>
+        </div>
+        <div class="card" id="simResultado">
+          <div class="card-header"><div class="card-title">Resultado de la Simulación</div></div>
+          <div class="detail-grid" style="margin-bottom:20px">
+            <div class="detail-item"><div class="detail-label">Anticipo</div><div class="detail-value" id="resAnticipo">$1.035.000</div></div>
+            <div class="detail-item"><div class="detail-label">Monto a financiar</div><div class="detail-value" id="resFinanciar">$2.415.000</div></div>
+            <div class="detail-item"><div class="detail-label">Cuota mensual (aprox.)</div><div class="detail-value" style="color:var(--accent)" id="resCuota">$214.800</div></div>
+            <div class="detail-item"><div class="detail-label">CFT</div><div class="detail-value" id="resCft">112.4%</div></div>
+            <div class="detail-item"><div class="detail-label">Total a pagar</div><div class="detail-value" id="resTotal">$4.901.400</div></div>
+            <div class="detail-item"><div class="detail-label">Intereses totales</div><div class="detail-value" id="resInteres">$2.486.400</div></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-primary btn-sm">Generar Contrato Mutuo</button>
+            <button class="btn btn-secondary btn-sm">Generar Pagarés</button>
+            <button class="btn btn-secondary btn-sm">Enviar por WhatsApp</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SECTOR 2: GESTORÍA ═══ -->
+    <div class="view" id="view-s2-gestoria">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Seguimiento de Patentamiento y Documentación</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Unidad</th><th>Comprador</th><th>Form. 01</th><th>Form. 08</th><th>Alta Imp.</th><th>Cédula Verde</th><th>Chapas</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td>Honda Wave 110 — VIN: 9C2</td><td>López, Santiago</td><td><span class="pill green">✓</span></td><td><span class="pill green">✓</span></td><td><span class="pill green">✓</span></td><td><span class="pill yellow">En trám.</span></td><td><span class="pill yellow">En trám.</span></td><td><span class="pill yellow">En proceso</span></td></tr>
+              <tr><td>Bajaj Dominar 250 — VIN: MD2</td><td>Gómez, Andrea</td><td><span class="pill green">✓</span></td><td><span class="pill green">✓</span></td><td><span class="pill yellow">En trám.</span></td><td><span class="pill red">Pend.</span></td><td><span class="pill red">Pend.</span></td><td><span class="pill yellow">En proceso</span></td></tr>
+              <tr><td>Yamaha FZ25 — VIN: MFD</td><td>Herrera, Tomás</td><td><span class="pill green">✓</span></td><td><span class="pill green">✓</span></td><td><span class="pill green">✓</span></td><td><span class="pill green">✓</span></td><td><span class="pill green">✓</span></td><td><span class="pill green">Lista</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SECTOR 3: MAPA EN VIVO ═══ -->
+    <div class="view" id="view-s3-mapa">
+      <div class="map-container">
+        <div class="map-grid"></div>
+        <!-- Simulated dots on a Buenos Aires-like grid -->
+        <div class="map-dot active" style="top:25%;left:30%" title="Honda Wave 110 — González, M.L."></div>
+        <div class="map-dot active" style="top:40%;left:55%" title="Bajaj Dominar 250 — Torres, F."></div>
+        <div class="map-dot active" style="top:60%;left:35%" title="TVS Apache 200 — Ramírez, Sol"></div>
+        <div class="map-dot active" style="top:35%;left:70%" title="Yamaha FZ25 — Fernández, Lucas"></div>
+        <div class="map-dot stopped" style="top:50%;left:45%" title="Zanella ZR 200 — Acosta, Lara"></div>
+        <div class="map-dot stopped" style="top:70%;left:60%" title="Honda CB190R — Cliente ext."></div>
+        <div class="map-dot alert" style="top:30%;left:80%" title="Honda CB190R — Rodríguez (MORA)"></div>
+        <div class="map-dot active" style="top:55%;left:25%" title="Honda Wave — Cliente ext."></div>
+        <div class="map-dot active" style="top:45%;left:15%" title="Bajaj NS200 — Cliente ext."></div>
+        <div class="map-dot offline" style="top:75%;left:40%" title="TVS NTORQ — Sin señal"></div>
+        <div class="map-dot active" style="top:20%;left:50%" title="Yamaha R15 — Cliente ext."></div>
+        <div class="map-dot alert" style="top:65%;left:75%" title="Honda CB300 — BOTÓN PÁNICO"></div>
+
+        <div class="map-legend">
+          <div class="map-legend-item"><div class="map-legend-dot" style="background:var(--success)"></div>En movimiento</div>
+          <div class="map-legend-item"><div class="map-legend-dot" style="background:var(--warning)"></div>Detenida</div>
+          <div class="map-legend-item"><div class="map-legend-dot" style="background:var(--danger);animation:pulse 1.5s infinite"></div>Alerta</div>
+          <div class="map-legend-item"><div class="map-legend-dot" style="background:var(--text-muted)"></div>Sin señal</div>
+        </div>
+        <div class="map-stats">
+          <div class="map-stat-card"><div class="ms-label">En tiempo real</div><div class="ms-value" style="color:var(--success)">187</div></div>
+          <div class="map-stat-card"><div class="ms-label">Alertas activas</div><div class="ms-value" style="color:var(--danger)">2</div></div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:16px">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Protocolo de Recupero Activo</div><span class="pill red">1 en curso</span></div>
+          <div class="alert-item critical">
+            <span class="alert-icon">🚨</span>
+            <div class="alert-text">
+              <strong>Honda CB300 — Botón de pánico activado</strong><br>
+              <span style="font-size:11px;color:var(--text-muted)">Última posición: -34.6037, -58.3816 · Hace 3 min</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+            <button class="btn btn-danger btn-sm">🔒 Cortar encendido</button>
+            <button class="btn btn-secondary btn-sm">📍 Ver traza histórica</button>
+            <button class="btn btn-secondary btn-sm">📞 Coord. fuerzas seg.</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Geocercas Configuradas</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Cliente</th><th>Zona</th><th>Radio</th><th>Estado</th></tr></thead>
+              <tbody>
+                <tr><td>González, M.L.</td><td>Domicilio + Trabajo</td><td>2 km</td><td><span class="pill green">OK</span></td></tr>
+                <tr><td>Torres, Facundo</td><td>AMBA</td><td>30 km</td><td><span class="pill green">OK</span></td></tr>
+                <tr><td>Rodríguez, Martín</td><td>Domicilio</td><td>5 km</td><td><span class="pill red">Violada</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SECTOR 3: SUSCRIPCIONES ═══ -->
+    <div class="view" id="view-s3-suscripciones">
+      <div class="stats-grid">
+        <div class="stat-card s3"><div class="stat-label">Suscripciones Activas</div><div class="stat-value">312</div></div>
+        <div class="stat-card s3"><div class="stat-label">MRR (Ingreso Recurrente)</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$2.340.000</div></div>
+        <div class="stat-card s3"><div class="stat-label">Tasa de Churn</div><div class="stat-value">2.1%</div><div class="stat-delta up">▲ Bajo</div></div>
+        <div class="stat-card warn"><div class="stat-label">Abonos Impagos</div><div class="stat-value">14</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Suscriptores GPS</div>
+          <div class="tabs" style="margin-bottom:0"><button class="tab-btn active">Todos</button><button class="tab-btn">Propios</button><button class="tab-btn">Externos</button><button class="tab-btn">Impagos</button></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Cliente</th><th>Dispositivo</th><th>Unidad</th><th>Plan</th><th>Abono/Mes</th><th>Pago</th><th>Desde</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td>González, M.L.</td><td>GPS-1201</td><td>Honda Wave 110</td><td>Premium 24/7</td><td style="font-variant-numeric:tabular-nums">$8.500</td><td>Débito auto.</td><td>15/02/2025</td><td><span class="pill green">Activo</span></td></tr>
+              <tr><td>Fernández, Lucas</td><td>GPS-1438</td><td>Yamaha FZ25</td><td>Básico</td><td style="font-variant-numeric:tabular-nums">$5.000</td><td>MercadoPago</td><td>01/06/2025</td><td><span class="pill green">Activo</span></td></tr>
+              <tr><td>Martínez, Camila</td><td>GPS-1592</td><td>Honda PCX 150</td><td>Premium 24/7</td><td style="font-variant-numeric:tabular-nums">$8.500</td><td>Débito auto.</td><td>10/03/2025</td><td><span class="pill green">Activo</span></td></tr>
+              <tr><td>Rivas, Gonzalo</td><td>GPS-1847</td><td>Honda CB300</td><td>Premium 24/7</td><td style="font-variant-numeric:tabular-nums">$8.500</td><td>Transferencia</td><td>01/08/2025</td><td><span class="pill red">Pánico</span></td></tr>
+              <tr><td>Cabrera, Daniela</td><td>GPS-1903</td><td>Zanella ZR 150</td><td>Básico</td><td style="font-variant-numeric:tabular-nums">$5.000</td><td>—</td><td>15/09/2025</td><td><span class="pill red">Impago</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SECTOR 3: ALERTAS / PÁNICO ═══ -->
+    <div class="view" id="view-s3-alertas">
+      <div class="stats-grid">
+        <div class="stat-card warn"><div class="stat-label">Alertas Hoy</div><div class="stat-value">7</div></div>
+        <div class="stat-card warn"><div class="stat-label">Botones Pánico (Mes)</div><div class="stat-value">3</div></div>
+        <div class="stat-card s3"><div class="stat-label">Recuperos Exitosos</div><div class="stat-value">2</div></div>
+        <div class="stat-card s3"><div class="stat-label">Tiempo Resp. Promedio</div><div class="stat-value">4.2 min</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Registro de Alertas</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Fecha/Hora</th><th>Tipo</th><th>Dispositivo</th><th>Cliente</th><th>Detalle</th><th>Resolución</th></tr></thead>
+            <tbody>
+              <tr><td>05/11 15:37</td><td><span class="pill red">Pánico</span></td><td>GPS-1847</td><td>Rivas, Gonzalo</td><td>Botón activado — CB300</td><td><span class="pill yellow">En curso</span></td></tr>
+              <tr><td>05/11 14:12</td><td><span class="pill yellow">Geocerca</span></td><td>GPS-0892</td><td>Rodríguez, Martín</td><td>Salió de zona — Domicilio</td><td><span class="pill blue">Monitoreando</span></td></tr>
+              <tr><td>05/11 08:45</td><td><span class="pill yellow">Batería</span></td><td>GPS-1592</td><td>Martínez, Camila</td><td>Corte batería detectado</td><td><span class="pill green">Resuelta</span></td></tr>
+              <tr><td>04/11 22:10</td><td><span class="pill red">Pánico</span></td><td>GPS-1201</td><td>González, M.L.</td><td>Falsa alarma — activación accidental</td><td><span class="pill green">Resuelta</span></td></tr>
+              <tr><td>04/11 19:30</td><td><span class="pill yellow">Movimiento</span></td><td>GPS-1438</td><td>Fernández, Lucas</td><td>Movimiento fuera de horario</td><td><span class="pill green">Resuelta</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CONTABILIDAD ═══ -->
+    <div class="view" id="view-contabilidad">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchContab('consolidado')">Consolidado</button>
+        <button class="tab-btn" onclick="switchContab('alquiler')">Sector 1 — Alquiler</button>
+        <button class="tab-btn" onclick="switchContab('ventas')">Sector 2 — Ventas</button>
+        <button class="tab-btn" onclick="switchContab('gps')">Sector 3 — GPS</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card s1"><div class="stat-label">Ingresos Totales (Mes)</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$48.9M</div><div class="stat-delta up">▲ 11%</div></div>
+        <div class="stat-card warn"><div class="stat-label">Egresos Totales</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$38.2M</div></div>
+        <div class="stat-card s3"><div class="stat-label">Resultado Neto</div><div class="stat-value" style="font-variant-numeric:tabular-nums;color:var(--success)">$10.7M</div><div class="stat-delta up">▲ 22% margen</div></div>
+        <div class="stat-card s2"><div class="stat-label">EBITDA</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$12.4M</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">P&L por Sector (Noviembre)</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Concepto</th><th>Alquiler</th><th>Ventas</th><th>GPS</th><th>Total</th></tr></thead>
+              <tbody>
+                <tr style="font-weight:600"><td>Ingresos</td><td style="font-variant-numeric:tabular-nums">$5.7M</td><td style="font-variant-numeric:tabular-nums">$42.5M</td><td style="font-variant-numeric:tabular-nums">$2.8M</td><td style="font-variant-numeric:tabular-nums">$48.9M</td></tr>
+                <tr><td>Costo directo</td><td style="font-variant-numeric:tabular-nums">-$1.2M</td><td style="font-variant-numeric:tabular-nums">-$34.8M</td><td style="font-variant-numeric:tabular-nums">-$0.8M</td><td style="font-variant-numeric:tabular-nums">-$36.8M</td></tr>
+                <tr><td>Gastos operativos</td><td style="font-variant-numeric:tabular-nums">-$0.5M</td><td style="font-variant-numeric:tabular-nums">-$0.8M</td><td style="font-variant-numeric:tabular-nums">-$0.4M</td><td style="font-variant-numeric:tabular-nums">-$1.7M</td></tr>
+                <tr style="font-weight:700;border-top:2px solid var(--border)"><td>Resultado</td><td style="color:var(--success);font-variant-numeric:tabular-nums">$4.0M</td><td style="color:var(--success);font-variant-numeric:tabular-nums">$6.9M</td><td style="color:var(--success);font-variant-numeric:tabular-nums">$1.6M</td><td style="color:var(--success);font-variant-numeric:tabular-nums">$10.7M</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Distribución de Ingresos</div></div>
+          <svg viewBox="0 0 300 200" style="width:100%;max-width:300px;margin:0 auto;display:block">
+            <!-- Donut chart -->
+            <circle cx="150" cy="100" r="70" fill="none" stroke="#2a2b38" stroke-width="24"/>
+            <circle cx="150" cy="100" r="70" fill="none" stroke="#6366f1" stroke-width="24"
+              stroke-dasharray="51.2 388" stroke-dashoffset="0" transform="rotate(-90 150 100)"/>
+            <circle cx="150" cy="100" r="70" fill="none" stroke="#3b82f6" stroke-width="24"
+              stroke-dasharray="382 58" stroke-dashoffset="-51.2" transform="rotate(-90 150 100)"/>
+            <circle cx="150" cy="100" r="70" fill="none" stroke="#10b981" stroke-width="24"
+              stroke-dasharray="25.2 415" stroke-dashoffset="-433.2" transform="rotate(-90 150 100)"/>
+            <text x="150" y="95" text-anchor="middle" fill="var(--text-primary)" font-family="var(--font-display)" font-size="20" font-weight="700">$48.9M</text>
+            <text x="150" y="112" text-anchor="middle" fill="var(--text-secondary)" font-size="10">Ingresos totales</text>
+          </svg>
+          <div style="display:flex;gap:20px;justify-content:center;margin-top:12px;font-size:12px;color:var(--text-secondary)">
+            <span><span style="display:inline-block;width:8px;height:8px;background:#6366f1;border-radius:2px;margin-right:6px;vertical-align:middle"></span>Alquiler 12%</span>
+            <span><span style="display:inline-block;width:8px;height:8px;background:#3b82f6;border-radius:2px;margin-right:6px;vertical-align:middle"></span>Ventas 82%</span>
+            <span><span style="display:inline-block;width:8px;height:8px;background:#10b981;border-radius:2px;margin-right:6px;vertical-align:middle"></span>GPS 6%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CONFIGURACIÓN / RBAC ═══ -->
+    <div class="view" id="view-config">
+      <div class="tabs">
+        <button class="tab-btn active">Roles y Permisos</button>
+        <button class="tab-btn">Usuarios</button>
+        <button class="tab-btn">Integraciones</button>
+        <button class="tab-btn">Lista de Precios</button>
+      </div>
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-header"><div class="card-title">Control de Acceso Basado en Roles (RBAC)</div><div class="card-subtitle">Define qué puede ver y hacer cada perfil en el sistema</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Rol</th><th>Dashboard</th><th>CRM</th><th>S1 Alquiler</th><th>S2 Ventas</th><th>S3 GPS</th><th>Contabilidad</th><th>Config</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Administrador</strong></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td></tr>
+              <tr><td><strong>Op. Alquiler</strong></td><td><span class="pill blue">S1</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill green">Total</span></td><td><span class="pill red">—</span></td><td><span class="pill blue">Coord.</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td></tr>
+              <tr><td><strong>Vendedor</strong></td><td><span class="pill blue">S2</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill red">—</span></td><td><span class="pill green">Total</span></td><td><span class="pill blue">Alta</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td></tr>
+              <tr><td><strong>Op. GPS / Central</strong></td><td><span class="pill blue">S3</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td><td><span class="pill green">Total</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td></tr>
+              <tr><td><strong>Contador</strong></td><td><span class="pill green">Total</span></td><td><span class="pill red">—</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill green">Total</span></td><td><span class="pill red">—</span></td></tr>
+              <tr><td><strong>Gestor</strong></td><td><span class="pill red">—</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill red">—</span></td><td><span class="pill blue">Gestoría</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Integraciones Activas</div></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--bg-elevated);border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">💳</span><div><div style="font-weight:600;font-size:13px">MercadoPago</div><div style="font-size:11px;color:var(--text-secondary)">Webhook de cobros automáticos</div></div></div>
+              <span class="pill green">Conectado</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--bg-elevated);border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">📱</span><div><div style="font-weight:600;font-size:13px">WhatsApp Business API</div><div style="font-size:11px;color:var(--text-secondary)">Notificaciones y recibos</div></div></div>
+              <span class="pill green">Conectado</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--bg-elevated);border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">🏦</span><div><div style="font-weight:600;font-size:13px">Webhook Bancario (CBU)</div><div style="font-size:11px;color:var(--text-secondary)">Conciliación automática de transferencias</div></div></div>
+              <span class="pill green">Conectado</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--bg-elevated);border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">🔍</span><div><div style="font-weight:600;font-size:13px">RENAPER / Veraz / Nosis</div><div style="font-size:11px;color:var(--text-secondary)">Scoring y validación de identidad</div></div></div>
+              <span class="pill green">Conectado</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--bg-elevated);border-radius:var(--radius-sm)">
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">📡</span><div><div style="font-weight:600;font-size:13px">Plataforma GPS (embebida)</div><div style="font-size:11px;color:var(--text-secondary)">Mapa en tiempo real dentro del CRM</div></div></div>
+              <span class="pill green">Integrado</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Lista Maestra de Precios</div><div class="card-subtitle">Indexada — Última actualización: 01/11/2026</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Modelo</th><th>Costo Term.</th><th>Precio Lista</th><th>Margen</th></tr></thead>
+              <tbody>
+                <tr><td>Honda Wave 110 S</td><td style="font-variant-numeric:tabular-nums">$1.520.000</td><td style="font-variant-numeric:tabular-nums">$1.850.000</td><td>21.7%</td></tr>
+                <tr><td>Honda CB 190R</td><td style="font-variant-numeric:tabular-nums">$2.580.000</td><td style="font-variant-numeric:tabular-nums">$3.100.000</td><td>20.2%</td></tr>
+                <tr><td>Bajaj Dominar 250</td><td style="font-variant-numeric:tabular-nums">$2.890.000</td><td style="font-variant-numeric:tabular-nums">$3.450.000</td><td>19.4%</td></tr>
+                <tr><td>Yamaha FZ 25</td><td style="font-variant-numeric:tabular-nums">$3.560.000</td><td style="font-variant-numeric:tabular-nums">$4.200.000</td><td>18.0%</td></tr>
+                <tr><td>TVS Apache RTR 200</td><td style="font-variant-numeric:tabular-nums">$2.290.000</td><td style="font-variant-numeric:tabular-nums">$2.780.000</td><td>21.4%</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:12px">Los precios se actualizan desde la terminal. Ningún presupuesto puede emitirse por fuera del sistema.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ═══ MOBILE NAV ═══ -->
+<div class="mobile-nav">
+  <button class="mobile-nav-item active" onclick="switchView('dashboard')"><span class="mn-icon">📊</span>Panel</button>
+  <button class="mobile-nav-item" onclick="switchView('s1-dashboard')"><span class="mn-icon">📋</span>Alquiler</button>
+  <button class="mobile-nav-item" onclick="switchView('s2-dashboard')"><span class="mn-icon">🏪</span>Ventas</button>
+  <button class="mobile-nav-item" onclick="switchView('s3-mapa')"><span class="mn-icon">🗺️</span>GPS</button>
+  <button class="mobile-nav-item" onclick="switchView('crm')"><span class="mn-icon">👤</span>CRM</button>
+</div>
+
+<!-- ═══ MODAL: NUEVO CLIENTE ═══ -->
+<div class="modal-overlay" id="modalCliente" hidden>
+  <div class="modal">
+    <div class="modal-header"><h2>Nuevo Cliente</h2><button class="modal-close" onclick="closeModal('modalCliente')">✕</button></div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group"><label class="form-label">DNI</label><input class="form-input" placeholder="32456789" id="newDni"></div>
+        <div class="form-group"><label class="form-label">CUIT</label><input class="form-input" placeholder="20-32456789-4"></div>
+        <div class="form-group"><label class="form-label">Apellido</label><input class="form-input" placeholder="Rodríguez"></div>
+        <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" placeholder="Martín"></div>
+        <div class="form-group"><label class="form-label">Teléfono</label><input class="form-input" placeholder="+54 11 4567-8901"></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" placeholder="correo@ejemplo.com"></div>
+        <div class="form-group" style="grid-column:span 2"><label class="form-label">Domicilio</label><input class="form-input" placeholder="Av. Corrientes 1234, CABA"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Sectores a vincular</label>
+        <div style="display:flex;gap:12px;margin-top:6px">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox"> Alquiler</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox"> Venta</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox"> GPS</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalCliente')">Cancelar</button><button class="btn btn-primary">Guardar Cliente</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: NUEVO CONTRATO ═══ -->
+<div class="modal-overlay" id="modalContrato" hidden>
+  <div class="modal">
+    <div class="modal-header"><h2>Nuevo Contrato de Alquiler</h2><button class="modal-close" onclick="closeModal('modalContrato')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Cliente (DNI o nombre)</label><input class="form-input" placeholder="Buscar cliente..."></div>
+      <div class="form-group"><label class="form-label">Unidad a asignar</label>
+        <select class="form-select"><option>Seleccionar unidad del stock...</option><option>Honda Wave 110 S — AB123CD</option><option>Bajaj Dominar 250 — CD456EF</option><option>TVS Apache 200 — GH789IJ</option></select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group"><label class="form-label">Plazo (meses)</label><select class="form-select"><option>6</option><option selected>12</option><option>18</option><option>24</option></select></div>
+        <div class="form-group"><label class="form-label">Valor cuota mensual ($)</label><input class="form-input" placeholder="45.000"></div>
+        <div class="form-group"><label class="form-label">Anticipo ($)</label><input class="form-input" placeholder="100.000"></div>
+        <div class="form-group"><label class="form-label">Valor residual / Opción compra ($)</label><input class="form-input" placeholder="350.000"></div>
+      </div>
+      <div class="form-group">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-top:8px">
+          <input type="checkbox" checked> Vincular dispositivo GPS automáticamente
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalContrato')">Cancelar</button><button class="btn btn-primary">Crear Contrato</button></div>
+  </div>
+</div>
+
+<script>
+const viewTitles = {
+  'dashboard': 'Dashboard Global',
+  'crm': 'CRM Unificado',
+  's1-dashboard': 'Sector 1 — Panel de Alquiler',
+  's1-contratos': 'Sector 1 — Contratos',
+  's1-cobranza': 'Sector 1 — Cobranza',
+  's1-scoring': 'Sector 1 — Scoring / KYC',
+  's2-dashboard': 'Sector 2 — Panel de Ventas',
+  's2-stock': 'Sector 2 — Inventario',
+  's2-simulador': 'Sector 2 — Simulador de Crédito',
+  's2-gestoria': 'Sector 2 — Gestoría y Trámites',
+  's3-mapa': 'Sector 3 — Mapa en Tiempo Real',
+  's3-suscripciones': 'Sector 3 — Suscripciones GPS',
+  's3-alertas': 'Sector 3 — Alertas y Pánico',
+  'contabilidad': 'Contabilidad Multicuenta',
+  'config': 'Configuración del Sistema'
+};
+
+function switchView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + id)?.classList.add('active');
+  document.getElementById('topbarTitle').textContent = viewTitles[id] || id;
+  // Update sidebar active
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick')?.includes("'" + id + "'")) n.classList.add('active');
+  });
+  // Update mobile nav
+  document.querySelectorAll('.mobile-nav-item').forEach(n => {
+    n.classList.remove('active');
+    if (n.getAttribute('onclick')?.includes("'" + id + "'")) n.classList.add('active');
+  });
+}
+
+function openModal(id) { document.getElementById(id).hidden = false; }
+function closeModal(id) { document.getElementById(id).hidden = true; }
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(ov => {
+  ov.addEventListener('click', e => { if (e.target === ov) ov.hidden = true; });
+});
+
+function runScoring() {
+  document.getElementById('scoringResult').hidden = false;
+}
+
+function calcularCredito() {
+  const precio = parseFloat((document.getElementById('simPrecio').value || '3450000').replace(/\./g, '').replace(',', '.'));
+  const anticipoPct = parseFloat(document.getElementById('simAnticipo').value) / 100;
+  const cuotas = parseInt(document.getElementById('simCuotas').value);
+  const tna = parseFloat(document.getElementById('simTna').value) / 100;
+  const tmensual = tna / 12;
+
+  const anticipo = precio * anticipoPct;
+  const financiar = precio - anticipo;
+  // French system
+  const cuotaMensual = financiar * (tmensual * Math.pow(1 + tmensual, cuotas)) / (Math.pow(1 + tmensual, cuotas) - 1);
+  const total = anticipo + cuotaMensual * cuotas;
+  const intereses = total - precio;
+  const cft = ((Math.pow(1 + tmensual, 12) - 1) * 100).toFixed(1);
+
+  const fmt = n => '$' + Math.round(n).toLocaleString('es-AR');
+  document.getElementById('resAnticipo').textContent = fmt(anticipo);
+  document.getElementById('resFinanciar').textContent = fmt(financiar);
+  document.getElementById('resCuota').textContent = fmt(cuotaMensual);
+  document.getElementById('resCft').textContent = cft + '%';
+  document.getElementById('resTotal').textContent = fmt(total);
+  document.getElementById('resInteres').textContent = fmt(intereses);
+}
+</script>
