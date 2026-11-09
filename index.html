@@ -2611,6 +2611,7 @@ async function cargarContratos(estado, btnEl) {
             <div class="user-actions-cell">
               ${c.estado === 'activo' ? `<button onclick="cambiarEstadoContrato('${c.id}','finalizado')" title="Finalizar">✅</button>` : ''}
               ${c.estado === 'activo' ? `<button class="btn-danger" onclick="cambiarEstadoContrato('${c.id}','rescindido')" title="Rescindir">🚫</button>` : ''}
+              ${c.estado === 'rescindido' ? `<button class="btn-danger" onclick="eliminarContrato('${c.id}')" title="Eliminar contrato">🗑️</button>` : ''}
             </div>
           </td>`;
         tbody.appendChild(tr);
@@ -2668,6 +2669,15 @@ async function guardarContrato() {
     } else { errEl.textContent = (result && result.error) || 'Error al crear contrato'; errEl.style.display = 'block'; }
   } catch (err) { errEl.textContent = 'Error: ' + err.message; errEl.style.display = 'block'; }
   btn.disabled = false; btn.textContent = 'Crear Contrato';
+}
+
+async function eliminarContrato(id) {
+  if (!confirm('¿Eliminar este contrato rescindido y todas sus cuotas? Esta acción no se puede deshacer.')) return;
+  try {
+    const r = await rpc('fn_eliminar_contrato', { p_id: id });
+    if (r && r.ok) { showToast('Contrato eliminado completamente'); cargarContratos(null); }
+    else showToast((r && r.error) || 'Error al eliminar', 'error');
+  } catch (err) { showToast('Error: ' + err.message, 'error'); }
 }
 
 async function cambiarEstadoContrato(id, nuevoEstado) {
