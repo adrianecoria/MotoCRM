@@ -763,6 +763,29 @@ tbody tr:hover { background: var(--bg-hover); }
 .app-container.authenticated {
   display: flex;
 }
+/* Config tabs */
+.config-tab { display: none; }
+.config-tab.active { display: block; }
+.user-actions-cell { display: flex; gap: 6px; }
+.user-actions-cell button {
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  color: var(--text-secondary); cursor: pointer;
+  padding: 5px 10px; border-radius: var(--radius-xs);
+  font-size: 12px; font-weight: 500; transition: all 0.15s;
+}
+.user-actions-cell button:hover { border-color: var(--accent); color: var(--accent); }
+.user-actions-cell button.btn-danger:hover { border-color: var(--danger); color: var(--danger); }
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 10000;
+  padding: 14px 20px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 500; color: #fff;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  transform: translateY(100px); opacity: 0;
+  transition: all 0.3s ease;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   20% { transform: translateX(-10px); }
@@ -1713,28 +1736,64 @@ tbody tr:hover { background: var(--bg-hover); }
     <!-- ═══ CONFIGURACIÓN / RBAC ═══ -->
     <div class="view" id="view-config">
       <div class="tabs">
-        <button class="tab-btn active">Roles y Permisos</button>
-        <button class="tab-btn">Usuarios</button>
-        <button class="tab-btn">Integraciones</button>
-        <button class="tab-btn">Lista de Precios</button>
+        <button class="tab-btn active" onclick="switchConfigTab('roles')">Roles y Permisos</button>
+        <button class="tab-btn" onclick="switchConfigTab('usuarios')">Usuarios</button>
+        <button class="tab-btn" onclick="switchConfigTab('integraciones')">Integraciones</button>
+        <button class="tab-btn" onclick="switchConfigTab('precios')">Lista de Precios</button>
       </div>
-      <div class="card" style="margin-bottom:24px">
-        <div class="card-header"><div class="card-title">Control de Acceso Basado en Roles (RBAC)</div><div class="card-subtitle">Define qué puede ver y hacer cada perfil en el sistema</div></div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Rol</th><th>Dashboard</th><th>CRM</th><th>S1 Alquiler</th><th>S2 Ventas</th><th>S3 GPS</th><th>Contabilidad</th><th>Config</th></tr></thead>
-            <tbody>
-              <tr><td><strong>Administrador</strong></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td></tr>
-              <tr><td><strong>Op. Alquiler</strong></td><td><span class="pill blue">S1</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill green">Total</span></td><td><span class="pill red">—</span></td><td><span class="pill blue">Coord.</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td></tr>
-              <tr><td><strong>Vendedor</strong></td><td><span class="pill blue">S2</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill red">—</span></td><td><span class="pill green">Total</span></td><td><span class="pill blue">Alta</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td></tr>
-              <tr><td><strong>Op. GPS / Central</strong></td><td><span class="pill blue">S3</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td><td><span class="pill green">Total</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td></tr>
-              <tr><td><strong>Contador</strong></td><td><span class="pill green">Total</span></td><td><span class="pill red">—</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill green">Total</span></td><td><span class="pill red">—</span></td></tr>
-              <tr><td><strong>Gestor</strong></td><td><span class="pill red">—</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill red">—</span></td><td><span class="pill blue">Gestoría</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td></tr>
-            </tbody>
-          </table>
+
+      <!-- TAB: Roles y Permisos -->
+      <div class="config-tab active" id="cfgTab-roles">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Control de Acceso Basado en Roles (RBAC)</div><div class="card-subtitle">Define qué puede ver y hacer cada perfil en el sistema</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Rol</th><th>Dashboard</th><th>CRM</th><th>S1 Alquiler</th><th>S2 Ventas</th><th>S3 GPS</th><th>Contabilidad</th><th>Config</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Administrador</strong></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td><td><span class="pill green">Total</span></td></tr>
+                <tr><td><strong>Op. Alquiler</strong></td><td><span class="pill blue">S1</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill green">Total</span></td><td><span class="pill red">—</span></td><td><span class="pill blue">Coord.</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td></tr>
+                <tr><td><strong>Vendedor</strong></td><td><span class="pill blue">S2</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill red">—</span></td><td><span class="pill green">Total</span></td><td><span class="pill blue">Alta</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td></tr>
+                <tr><td><strong>Op. GPS / Central</strong></td><td><span class="pill blue">S3</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td><td><span class="pill green">Total</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td></tr>
+                <tr><td><strong>Contador</strong></td><td><span class="pill green">Total</span></td><td><span class="pill red">—</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill green">Total</span></td><td><span class="pill red">—</span></td></tr>
+                <tr><td><strong>Gestor</strong></td><td><span class="pill red">—</span></td><td><span class="pill blue">Lectura</span></td><td><span class="pill red">—</span></td><td><span class="pill blue">Gestoría</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td><td><span class="pill red">—</span></td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-      <div class="grid-2">
+
+      <!-- TAB: Usuarios -->
+      <div class="config-tab" id="cfgTab-usuarios">
+        <div class="card">
+          <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div class="card-title">Gestión de Usuarios</div>
+              <div class="card-subtitle">Agregá, editá y administrá accesos del equipo</div>
+            </div>
+            <button class="btn btn-primary" onclick="openModal('modalUsuario'); resetUserForm();">+ Nuevo Usuario</button>
+          </div>
+          <div id="userListLoading" style="text-align:center;padding:40px;color:var(--text-secondary)">Cargando usuarios...</div>
+          <div class="table-wrap" id="userTableWrap" style="display:none">
+            <table>
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Nombre</th>
+                  <th>Email</th>
+                  <th>Rol</th>
+                  <th>Estado</th>
+                  <th>Último acceso</th>
+                  <th style="width:100px">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="userTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: Integraciones -->
+      <div class="config-tab" id="cfgTab-integraciones">
         <div class="card">
           <div class="card-header"><div class="card-title">Integraciones Activas</div></div>
           <div style="display:flex;flex-direction:column;gap:10px">
@@ -1760,6 +1819,10 @@ tbody tr:hover { background: var(--bg-hover); }
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- TAB: Lista de Precios -->
+      <div class="config-tab" id="cfgTab-precios">
         <div class="card">
           <div class="card-header"><div class="card-title">Lista Maestra de Precios</div><div class="card-subtitle">Indexada — Última actualización: 01/11/2026</div></div>
           <div class="table-wrap">
@@ -1844,46 +1907,132 @@ tbody tr:hover { background: var(--bg-hover); }
   </div>
 </div>
 
-<script>
-// ═══ AUTENTICACIÓN ═══
-const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'MotoGest2026';
+<!-- ═══ MODAL: NUEVO/EDITAR USUARIO ═══ -->
+<div class="modal-overlay" id="modalUsuario" hidden>
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header"><h2 id="modalUsuarioTitle">Nuevo Usuario</h2><button class="modal-close" onclick="closeModal('modalUsuario')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editUserId">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" id="uNombre" placeholder="Juan" required></div>
+        <div class="form-group"><label class="form-label">Apellido</label><input class="form-input" id="uApellido" placeholder="Pérez" required></div>
+        <div class="form-group"><label class="form-label">Usuario</label><input class="form-input" id="uUsername" placeholder="jperez" required autocomplete="off"></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="uEmail" placeholder="juan@motogest.com" type="email" required></div>
+        <div class="form-group"><label class="form-label">Contraseña <span id="passHint" style="font-weight:400;color:var(--text-muted)"></span></label><input class="form-input" id="uPassword" placeholder="Mínimo 6 caracteres" type="password" autocomplete="new-password"></div>
+        <div class="form-group"><label class="form-label">Rol</label>
+          <select class="form-select" id="uRol">
+            <option value="administrador">Administrador</option>
+            <option value="operador_alquiler">Op. Alquiler</option>
+            <option value="vendedor" selected>Vendedor</option>
+            <option value="operador_gps">Op. GPS / Central</option>
+            <option value="contador">Contador</option>
+            <option value="gestor">Gestor</option>
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:span 2"><label class="form-label">Teléfono</label><input class="form-input" id="uTelefono" placeholder="+54 11 1234-5678"></div>
+      </div>
+      <div id="userFormError" class="login-error" style="margin-top:12px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalUsuario')">Cancelar</button>
+      <button class="btn btn-primary" id="btnGuardarUsuario" onclick="guardarUsuario()">Crear Usuario</button>
+    </div>
+  </div>
+</div>
 
-function handleLogin(e) {
+<!-- ═══ TOAST NOTIFICATIONS ═══ -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ SUPABASE CONFIG ═══
+const SUPABASE_URL = 'https://pdyjfatzgcqsmgxxopdo.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkeWpmYXR6Z2Nxc21neHhvcGRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxODE3NjIsImV4cCI6MjEwOTc1Nzc2Mn0.U7C5I18r4nNsoBJfaLsHBIB1jCN901e_dc_VKSYvees';
+
+async function rpc(fnName, params = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fnName}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY
+    },
+    body: JSON.stringify(params)
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  return res.json();
+}
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ═══ AUTENTICACIÓN (Supabase) ═══
+let currentUser = null;
+
+async function handleLogin(e) {
   e.preventDefault();
   const user = document.getElementById('loginUser').value.trim();
   const pass = document.getElementById('loginPass').value;
   const errorEl = document.getElementById('loginError');
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.textContent = 'Ingresando...'; btn.disabled = true;
 
-  if (user === ADMIN_USER && pass === ADMIN_PASS) {
-    errorEl.style.display = 'none';
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('appContainer').classList.add('authenticated');
-    try { sessionStorage.setItem('motogest_auth', '1'); } catch(ex) {}
-  } else {
+  try {
+    const result = await rpc('fn_login', { p_username: user, p_password: pass });
+    if (result && result.ok) {
+      errorEl.style.display = 'none';
+      currentUser = result.user;
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('appContainer').classList.add('authenticated');
+      updateSidebarUser();
+      try { sessionStorage.setItem('motogest_auth', JSON.stringify(currentUser)); } catch(ex) {}
+    } else {
+      errorEl.textContent = (result && result.error) || 'Credenciales inválidas';
+      errorEl.style.display = 'block';
+      document.getElementById('loginPass').value = '';
+      document.getElementById('loginPass').focus();
+      const card = document.querySelector('.login-card');
+      card.style.animation = 'shake 0.4s ease';
+      setTimeout(() => card.style.animation = '', 400);
+    }
+  } catch (err) {
+    errorEl.textContent = 'Error de conexión. Verificá tu internet.';
     errorEl.style.display = 'block';
-    document.getElementById('loginPass').value = '';
-    document.getElementById('loginPass').focus();
-    // Shake animation
-    const card = document.querySelector('.login-card');
-    card.style.animation = 'shake 0.4s ease';
-    setTimeout(() => card.style.animation = '', 400);
   }
+  btn.textContent = 'Iniciar Sesión'; btn.disabled = false;
+}
+
+function updateSidebarUser() {
+  if (!currentUser) return;
+  const uname = document.querySelector('.user-name');
+  const urole = document.querySelector('.user-role');
+  const uavatar = document.querySelector('.user-avatar');
+  if (uname) uname.textContent = currentUser.nombre + ' ' + currentUser.apellido;
+  if (urole) urole.textContent = formatRol(currentUser.rol);
+  if (uavatar) uavatar.textContent = (currentUser.nombre[0] + currentUser.apellido[0]).toUpperCase();
+}
+
+function formatRol(r) {
+  const map = { administrador:'Administrador', operador_alquiler:'Op. Alquiler', vendedor:'Vendedor', operador_gps:'Op. GPS / Central', contador:'Contador', gestor:'Gestor' };
+  return map[r] || r;
 }
 
 function togglePassword() {
   const inp = document.getElementById('loginPass');
   const btn = document.getElementById('togglePassBtn');
-  if (inp.type === 'password') {
-    inp.type = 'text';
-    btn.textContent = '🔒';
-  } else {
-    inp.type = 'password';
-    btn.textContent = '👁';
-  }
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🔒'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
 }
 
 function logout() {
+  currentUser = null;
   try { sessionStorage.removeItem('motogest_auth'); } catch(ex) {}
   document.getElementById('appContainer').classList.remove('authenticated');
   document.getElementById('loginScreen').style.display = 'flex';
@@ -1893,15 +2042,161 @@ function logout() {
   document.getElementById('loginUser').focus();
 }
 
-// Auto-login if session is still active
+// Auto-login if session active
 (function checkSession() {
   try {
-    if (sessionStorage.getItem('motogest_auth') === '1') {
+    const saved = sessionStorage.getItem('motogest_auth');
+    if (saved) {
+      currentUser = JSON.parse(saved);
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('appContainer').classList.add('authenticated');
+      updateSidebarUser();
     }
   } catch(ex) {}
 })();
+
+// ═══ CONFIG TABS ═══
+function switchConfigTab(tab) {
+  document.querySelectorAll('.config-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('cfgTab-' + tab)?.classList.add('active');
+  const labels = ['roles', 'usuarios', 'integraciones', 'precios'];
+  document.querySelectorAll('#view-config .tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', labels[i] === tab);
+  });
+  if (tab === 'usuarios') cargarUsuarios();
+}
+
+// ═══ GESTIÓN DE USUARIOS ═══
+function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+async function cargarUsuarios() {
+  const loading = document.getElementById('userListLoading');
+  const wrap = document.getElementById('userTableWrap');
+  const tbody = document.getElementById('userTableBody');
+  loading.style.display = 'block'; wrap.style.display = 'none';
+
+  try {
+    const usuarios = await rpc('fn_listar_usuarios');
+    tbody.innerHTML = '';
+    if (usuarios && usuarios.length) {
+      usuarios.forEach(u => {
+        const tr = document.createElement('tr');
+        const lastAccess = u.ultimo_acceso
+          ? new Date(u.ultimo_acceso).toLocaleString('es-AR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' })
+          : 'Nunca';
+        tr.innerHTML = `
+          <td><strong>${esc(u.username)}</strong></td>
+          <td>${esc(u.nombre)} ${esc(u.apellido)}</td>
+          <td style="font-size:12px">${esc(u.email)}</td>
+          <td><span class="pill blue">${formatRol(u.rol)}</span></td>
+          <td><span class="pill ${u.activo ? 'green' : 'red'}">${u.activo ? 'Activo' : 'Inactivo'}</span></td>
+          <td style="font-size:12px;color:var(--text-secondary)">${lastAccess}</td>
+          <td>
+            <div class="user-actions-cell">
+              <button onclick='editarUsuario(${JSON.stringify(u).replace(/'/g,"&#39;")})' title="Editar">✏️</button>
+              <button class="btn-danger" onclick="toggleUsuario('${u.id}', ${u.activo})" title="${u.activo ? 'Desactivar' : 'Activar'}">${u.activo ? '🚫' : '✅'}</button>
+            </div>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    } else {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-secondary);padding:24px">No hay usuarios registrados</td></tr>';
+    }
+    loading.style.display = 'none'; wrap.style.display = 'block';
+  } catch (err) {
+    loading.textContent = 'Error al cargar usuarios: ' + err.message;
+  }
+}
+
+function resetUserForm() {
+  document.getElementById('editUserId').value = '';
+  document.getElementById('uNombre').value = '';
+  document.getElementById('uApellido').value = '';
+  document.getElementById('uUsername').value = ''; document.getElementById('uUsername').disabled = false;
+  document.getElementById('uEmail').value = '';
+  document.getElementById('uPassword').value = '';
+  document.getElementById('uRol').value = 'vendedor';
+  document.getElementById('uTelefono').value = '';
+  document.getElementById('userFormError').style.display = 'none';
+  document.getElementById('modalUsuarioTitle').textContent = 'Nuevo Usuario';
+  document.getElementById('btnGuardarUsuario').textContent = 'Crear Usuario';
+  document.getElementById('passHint').textContent = '';
+}
+
+function editarUsuario(u) {
+  document.getElementById('editUserId').value = u.id;
+  document.getElementById('uNombre').value = u.nombre;
+  document.getElementById('uApellido').value = u.apellido;
+  document.getElementById('uUsername').value = u.username; document.getElementById('uUsername').disabled = true;
+  document.getElementById('uEmail').value = u.email;
+  document.getElementById('uPassword').value = '';
+  document.getElementById('uRol').value = u.rol;
+  document.getElementById('uTelefono').value = u.telefono || '';
+  document.getElementById('userFormError').style.display = 'none';
+  document.getElementById('modalUsuarioTitle').textContent = 'Editar Usuario';
+  document.getElementById('btnGuardarUsuario').textContent = 'Guardar Cambios';
+  document.getElementById('passHint').textContent = '(dejar vacío para no cambiar)';
+  openModal('modalUsuario');
+}
+
+async function guardarUsuario() {
+  const id = document.getElementById('editUserId').value;
+  const nombre = document.getElementById('uNombre').value.trim();
+  const apellido = document.getElementById('uApellido').value.trim();
+  const username = document.getElementById('uUsername').value.trim();
+  const email = document.getElementById('uEmail').value.trim();
+  const password = document.getElementById('uPassword').value;
+  const rol = document.getElementById('uRol').value;
+  const telefono = document.getElementById('uTelefono').value.trim();
+  const errEl = document.getElementById('userFormError');
+
+  if (!nombre || !apellido || !username || !email) {
+    errEl.textContent = 'Completá todos los campos obligatorios.'; errEl.style.display = 'block'; return;
+  }
+  if (!id && (!password || password.length < 6)) {
+    errEl.textContent = 'La contraseña debe tener al menos 6 caracteres.'; errEl.style.display = 'block'; return;
+  }
+  if (id && password && password.length < 6) {
+    errEl.textContent = 'La contraseña nueva debe tener al menos 6 caracteres.'; errEl.style.display = 'block'; return;
+  }
+
+  const btn = document.getElementById('btnGuardarUsuario');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  try {
+    let result;
+    if (id) {
+      const params = { p_id: id, p_email: email, p_nombre: nombre, p_apellido: apellido, p_rol: rol, p_telefono: telefono || null };
+      if (password) params.p_password = password;
+      result = await rpc('fn_actualizar_usuario', params);
+    } else {
+      result = await rpc('fn_crear_usuario', {
+        p_username: username, p_password: password, p_email: email,
+        p_nombre: nombre, p_apellido: apellido, p_rol: rol,
+        p_telefono: telefono || null
+      });
+    }
+    if (result && result.ok) {
+      closeModal('modalUsuario');
+      showToast(id ? 'Usuario actualizado' : 'Usuario creado correctamente');
+      cargarUsuarios();
+    } else {
+      errEl.textContent = (result && result.error) || 'Error al guardar'; errEl.style.display = 'block';
+    }
+  } catch (err) {
+    errEl.textContent = 'Error de conexión: ' + err.message; errEl.style.display = 'block';
+  }
+  btn.disabled = false; btn.textContent = id ? 'Guardar Cambios' : 'Crear Usuario';
+}
+
+async function toggleUsuario(id, activo) {
+  if (!confirm(activo ? '¿Desactivar este usuario?' : '¿Reactivar este usuario?')) return;
+  try {
+    const result = await rpc('fn_actualizar_usuario', { p_id: id, p_activo: !activo });
+    if (result && result.ok) { showToast(activo ? 'Usuario desactivado' : 'Usuario reactivado'); cargarUsuarios(); }
+    else showToast((result && result.error) || 'Error', 'error');
+  } catch (err) { showToast('Error de conexión', 'error'); }
+}
 
 const viewTitles = {
   'dashboard': 'Dashboard Global',
