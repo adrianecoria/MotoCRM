@@ -6,14 +6,14 @@
 -- Usuarios
 GRANT EXECUTE ON FUNCTION public.fn_login(text, text) TO anon;
 GRANT EXECUTE ON FUNCTION public.fn_listar_usuarios() TO anon;
-GRANT EXECUTE ON FUNCTION public.fn_crear_usuario(text, text, text, text, text, text, text) TO anon;
-GRANT EXECUTE ON FUNCTION public.fn_actualizar_usuario(uuid, text, text, text, text, text, text, boolean) TO anon;
+GRANT EXECUTE ON FUNCTION public.fn_crear_usuario(text, text, text, text, text, rol_usuario, text) TO anon;
+GRANT EXECUTE ON FUNCTION public.fn_actualizar_usuario(uuid, text, text, text, rol_usuario, text, text, boolean) TO anon;
 GRANT EXECUTE ON FUNCTION public.fn_eliminar_usuario(uuid) TO anon;
 
 -- Clientes
 GRANT EXECUTE ON FUNCTION public.fn_listar_clientes() TO anon;
-GRANT EXECUTE ON FUNCTION public.fn_crear_cliente(text, text, text, text, text, text, text, text, text, boolean, boolean, boolean, text, text) TO anon;
-GRANT EXECUTE ON FUNCTION public.fn_actualizar_cliente(uuid, text, text, text, text, text, text, text, text, boolean, boolean, boolean, text, text, text) TO anon;
+GRANT EXECUTE ON FUNCTION public.fn_crear_cliente(text, text, text, text, text, text, text, text, text, text, boolean, boolean, boolean, text) TO anon;
+GRANT EXECUTE ON FUNCTION public.fn_actualizar_cliente(uuid, text, text, text, text, text, text, text, text, text, text, boolean, boolean, boolean, text, boolean) TO anon;
 GRANT EXECUTE ON FUNCTION public.fn_eliminar_cliente(uuid) TO anon;
 
 -- Motovehículos
@@ -50,7 +50,7 @@ GRANT EXECUTE ON FUNCTION public.fn_actualizar_tramite(uuid, text, text, text, t
 
 -- Ventas
 GRANT EXECUTE ON FUNCTION public.fn_listar_ventas(text) TO anon;
-GRANT EXECUTE ON FUNCTION public.fn_crear_venta(uuid, uuid, uuid, text, numeric, numeric, numeric, numeric, integer, numeric, numeric, text, boolean, text) TO anon;
+GRANT EXECUTE ON FUNCTION public.fn_crear_venta(uuid, uuid, uuid, text, numeric, numeric, numeric, integer, numeric, numeric, text, boolean, text) TO anon;
 GRANT EXECUTE ON FUNCTION public.fn_actualizar_venta(uuid, text, text) TO anon;
 
 -- Contabilidad
