@@ -1150,85 +1150,22 @@ tbody tr:hover { background: var(--bg-hover); }
     <!-- ═══ SECTOR 1: PANEL ALQUILER ═══ -->
     <div class="view" id="view-s1-dashboard">
       <div class="stats-grid">
-        <div class="stat-card s1"><div class="stat-label">Contratos Activos</div><div class="stat-value">127</div><div class="stat-delta up">▲ 12 este mes</div></div>
-        <div class="stat-card s1"><div class="stat-label">Cuotas Cobradas (Mes)</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$4.280.000</div><div class="stat-delta up">▲ 92% cobrado</div></div>
-        <div class="stat-card warn"><div class="stat-label">Mora Total Acumulada</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$890.000</div><div class="stat-delta down">▼ 5 contratos</div></div>
-        <div class="stat-card s1"><div class="stat-label">Opción Compra Próx.</div><div class="stat-value">8</div><div class="stat-delta up">Próx. 30 días</div></div>
+        <div class="stat-card s1"><div class="stat-label">Contratos Activos</div><div class="stat-value" id="s1ContratosActivos">—</div></div>
+        <div class="stat-card s1"><div class="stat-label">Motos en Alquiler</div><div class="stat-value" id="s1MotosAlquiladas">—</div></div>
+        <div class="stat-card warn"><div class="stat-label">Contratos en Mora</div><div class="stat-value" id="s1ContratosMora">—</div></div>
+        <div class="stat-card s1"><div class="stat-label">Pagos Pendientes</div><div class="stat-value" id="s1PagosPendientes" style="font-variant-numeric:tabular-nums">—</div></div>
       </div>
 
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header"><div class="card-title">Cuotas Vencidas Hoy</div></div>
-          <div class="alert-item critical">
-            <span class="alert-icon">🔴</span>
-            <div class="alert-text"><strong>#A-0892</strong> — Rodríguez, Martín<br><span style="font-size:11px;color:var(--text-muted)">Honda CB190R · Cuota 8/24 · $45.000 · 45 días</span></div>
-            <div style="display:flex;flex-direction:column;gap:4px">
-              <button class="btn btn-danger btn-sm">Corte motor</button>
-              <button class="btn btn-secondary btn-sm">WhatsApp</button>
-            </div>
+      <div class="card" style="margin-top:20px">
+        <div class="card-header"><div class="card-title">Últimos Contratos de Alquiler</div></div>
+        <div id="s1UltContratosLoading" style="text-align:center;padding:20px;color:var(--text-secondary)">Cargando...</div>
+        <div id="s1UltContratosWrap" style="display:none">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Cliente</th><th>Moto</th><th>Inicio</th><th>Cuotas</th><th>Monto</th><th>Estado</th></tr></thead>
+              <tbody id="s1UltContratosBody"></tbody>
+            </table>
           </div>
-          <div class="alert-item warning">
-            <span class="alert-icon">⚠️</span>
-            <div class="alert-text"><strong>#A-1023</strong> — Pérez, Juan<br><span style="font-size:11px;color:var(--text-muted)">Bajaj Dominar 250 · Cuota 3/18 · $52.000 · 8 días</span></div>
-            <div><button class="btn btn-secondary btn-sm">WhatsApp</button></div>
-          </div>
-          <div class="alert-item warning">
-            <span class="alert-icon">⚠️</span>
-            <div class="alert-text"><strong>#A-1105</strong> — Ramírez, Sol<br><span style="font-size:11px;color:var(--text-muted)">TVS Apache 200 · Cuota 5/12 · $38.000 · 3 días</span></div>
-            <div><button class="btn btn-secondary btn-sm">WhatsApp</button></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header"><div class="card-title">Flujo de Caja Proyectado (Alquileres)</div></div>
-          <svg viewBox="0 0 440 180" style="width:100%;height:auto">
-            <line x1="40" y1="160" x2="420" y2="160" stroke="#2a2b38" stroke-width="1"/>
-            <line x1="40" y1="120" x2="420" y2="120" stroke="#2a2b38" stroke-width="1"/>
-            <line x1="40" y1="80" x2="420" y2="80" stroke="#2a2b38" stroke-width="1"/>
-            <line x1="40" y1="40" x2="420" y2="40" stroke="#2a2b38" stroke-width="1"/>
-            <text x="35" y="164" text-anchor="end" class="chart-label">0</text>
-            <text x="35" y="124" text-anchor="end" class="chart-label">2M</text>
-            <text x="35" y="84" text-anchor="end" class="chart-label">4M</text>
-            <text x="35" y="44" text-anchor="end" class="chart-label">6M</text>
-            <!-- Bars -->
-            <rect x="65" y="68" width="20" height="92" rx="4" ry="4" fill="#6366f1" opacity="0.85"/>
-            <text x="75" y="158" text-anchor="middle" class="chart-label">Nov</text>
-            <rect x="125" y="60" width="20" height="100" rx="4" ry="4" fill="#6366f1" opacity="0.85"/>
-            <text x="135" y="158" text-anchor="middle" class="chart-label">Dic</text>
-            <rect x="185" y="72" width="20" height="88" rx="4" ry="4" fill="#6366f1" opacity="0.6"/>
-            <text x="195" y="158" text-anchor="middle" class="chart-label">Ene</text>
-            <rect x="245" y="75" width="20" height="85" rx="4" ry="4" fill="#6366f1" opacity="0.5"/>
-            <text x="255" y="158" text-anchor="middle" class="chart-label">Feb</text>
-            <rect x="305" y="80" width="20" height="80" rx="4" ry="4" fill="#6366f1" opacity="0.4"/>
-            <text x="315" y="158" text-anchor="middle" class="chart-label">Mar</text>
-            <rect x="365" y="78" width="20" height="82" rx="4" ry="4" fill="#6366f1" opacity="0.35"/>
-            <text x="375" y="158" text-anchor="middle" class="chart-label">Abr</text>
-            <text x="75" y="62" text-anchor="middle" class="chart-value">4.6M</text>
-            <text x="135" y="54" text-anchor="middle" class="chart-value">5.0M</text>
-          </svg>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Mantenimientos Preventivos Pendientes</div>
-          <span class="pill yellow">3 vencidos</span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Unidad</th><th>Contrato</th><th>Km Actual</th><th>Próx. Service</th><th>Estado</th><th>Acción</th></tr></thead>
-            <tbody>
-              <tr>
-                <td>Honda CB190R — AB123CD</td><td>#A-0892</td><td style="font-variant-numeric:tabular-nums">7.820 km</td><td style="font-variant-numeric:tabular-nums">7.500 km</td><td><span class="pill red">Vencido</span></td><td><button class="btn btn-secondary btn-sm">Avisar por WA</button></td>
-              </tr>
-              <tr>
-                <td>Yamaha FZ25 — CD456EF</td><td>#A-0934</td><td style="font-variant-numeric:tabular-nums">5.100 km</td><td style="font-variant-numeric:tabular-nums">5.000 km</td><td><span class="pill red">Vencido</span></td><td><button class="btn btn-secondary btn-sm">Avisar por WA</button></td>
-              </tr>
-              <tr>
-                <td>Bajaj Dominar 250 — EF789GH</td><td>#A-1023</td><td style="font-variant-numeric:tabular-nums">4.200 km</td><td style="font-variant-numeric:tabular-nums">5.000 km</td><td><span class="pill green">OK (800 km rest.)</span></td><td>—</td>
-              </tr>
-            </tbody>
-          </table>
         </div>
       </div>
     </div>
@@ -1257,30 +1194,21 @@ tbody tr:hover { background: var(--bg-hover); }
 
     <!-- ═══ SECTOR 1: COBRANZA ═══ -->
     <div class="view" id="view-s1-cobranza">
-      <div class="stats-grid">
-        <div class="stat-card s1"><div class="stat-label">Total Facturado (Mes)</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$5.715.000</div></div>
-        <div class="stat-card s1"><div class="stat-label">Total Cobrado</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$4.280.000</div><div class="stat-delta up">74.9%</div></div>
-        <div class="stat-card warn"><div class="stat-label">Pendiente de Cobro</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$1.435.000</div></div>
-        <div class="stat-card s1"><div class="stat-label">Intereses Moratorios</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$142.800</div></div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Movimientos de Cobranza Recientes</div>
-          <div class="tabs" style="margin-bottom:0">
-            <button class="tab-btn active">Todos</button>
-            <button class="tab-btn">Automáticos</button>
-            <button class="tab-btn">Manuales</button>
-          </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div class="tabs" style="margin-bottom:0">
+          <button class="tab-btn active" onclick="cargarPagos(null, this)">Todos</button>
+          <button class="tab-btn" onclick="cargarPagos('acreditado', this)">Acreditados</button>
+          <button class="tab-btn" onclick="cargarPagos('pendiente', this)">Pendientes</button>
+          <button class="tab-btn" onclick="cargarPagos('rechazado', this)">Rechazados</button>
         </div>
+        <button class="btn btn-primary" onclick="abrirNuevoPago()">+ Registrar Pago</button>
+      </div>
+      <div id="pagoListLoading" style="text-align:center;padding:40px;color:var(--text-secondary)">Cargando pagos...</div>
+      <div id="pagoTableWrap" class="card" style="padding:0;display:none">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Fecha</th><th>Contrato</th><th>Cliente</th><th>Monto</th><th>Método</th><th>Estado</th><th>Recibo</th></tr></thead>
-            <tbody>
-              <tr><td>05/11/2026</td><td>A-0934</td><td>Torres, Facundo</td><td style="font-variant-numeric:tabular-nums">$58.000</td><td>Transferencia (webhook)</td><td><span class="pill green">Acreditado</span></td><td><button class="btn btn-secondary btn-sm">PDF</button></td></tr>
-              <tr><td>05/11/2026</td><td>A-1148</td><td>Acosta, Lara</td><td style="font-variant-numeric:tabular-nums">$35.000</td><td>MercadoPago</td><td><span class="pill green">Acreditado</span></td><td><button class="btn btn-secondary btn-sm">PDF</button></td></tr>
-              <tr><td>04/11/2026</td><td>A-0756</td><td>González, M.L.</td><td style="font-variant-numeric:tabular-nums">$32.000</td><td>Débito CBU</td><td><span class="pill green">Acreditado</span></td><td><button class="btn btn-secondary btn-sm">PDF</button></td></tr>
-              <tr><td>03/11/2026</td><td>A-1023</td><td>Pérez, Juan</td><td style="font-variant-numeric:tabular-nums">$52.000</td><td>—</td><td><span class="pill red">Rechazado</span></td><td>—</td></tr>
-            </tbody>
+            <thead><tr><th>Fecha</th><th>Contrato</th><th>Cliente</th><th>Monto</th><th>Método</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="pagoTableBody"></tbody>
           </table>
         </div>
       </div>
@@ -1288,82 +1216,39 @@ tbody tr:hover { background: var(--bg-hover); }
 
     <!-- ═══ SECTOR 1: SCORING / KYC ═══ -->
     <div class="view" id="view-s1-scoring">
-      <div class="card" style="margin-bottom:24px">
-        <div class="card-header"><div class="card-title">Motor de Scoring Automatizado</div><div class="card-subtitle">Validación de identidad y antecedentes antes de entregar la unidad</div></div>
-        <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
-          <div style="flex:1;min-width:200px"><label class="form-label">DNI del solicitante</label><input class="form-input" placeholder="Ej: 32456789" id="scoringDni"></div>
-          <div style="flex:1;min-width:200px"><label class="form-label">CUIT (opcional)</label><input class="form-input" placeholder="Ej: 20-32456789-4"></div>
-          <div style="padding-top:20px"><button class="btn btn-primary" onclick="runScoring()">Consultar Scoring</button></div>
+      <div id="scoringListLoading" style="text-align:center;padding:40px;color:var(--text-secondary)">Cargando scoring de clientes...</div>
+      <div id="scoringTableWrap" class="card" style="padding:0;display:none">
+        <div class="card-header" style="padding:16px 20px">
+          <div><div class="card-title">Scoring y KYC de Clientes</div><div class="card-subtitle">Historial de evaluación crediticia</div></div>
         </div>
-      </div>
-      <div id="scoringResult" hidden>
-        <div class="grid-3">
-          <div class="card" style="text-align:center">
-            <div class="card-title" style="margin-bottom:12px">Score Crediticio</div>
-            <div class="score-ring high" style="margin:0 auto" id="scoreRing">780</div>
-            <div style="margin-top:8px;font-size:12px;color:var(--success);font-weight:600" id="scoreLabel">Riesgo bajo — Aprobado</div>
-          </div>
-          <div class="card">
-            <div class="card-title" style="margin-bottom:12px">Validaciones</div>
-            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
-              <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--success)">✓</span> RENAPER — Identidad verificada</div>
-              <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--success)">✓</span> Veraz/Nosis — Sin deuda vigente</div>
-              <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--success)">✓</span> Registro conducir — Vigente</div>
-              <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--warning)">⚠</span> Servicio domiciliario — Pendiente</div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-title" style="margin-bottom:12px">Documentos KYC</div>
-            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
-              <div style="display:flex;justify-content:space-between"><span>Foto DNI frente</span><span class="pill green">✓</span></div>
-              <div style="display:flex;justify-content:space-between"><span>Foto DNI dorso</span><span class="pill green">✓</span></div>
-              <div style="display:flex;justify-content:space-between"><span>Selfie biométrica</span><span class="pill green">✓</span></div>
-              <div style="display:flex;justify-content:space-between"><span>Servicio a nombre</span><span class="pill yellow">Pend.</span></div>
-              <div style="display:flex;justify-content:space-between"><span>Registro conducir</span><span class="pill green">✓</span></div>
-            </div>
-          </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Cliente</th><th>DNI</th><th>Score</th><th>Nivel</th><th>RENAPER</th><th>Veraz</th><th>Lic. Conducir</th><th>Servicio Dom.</th><th>Selfie Bio.</th><th>Acciones</th></tr></thead>
+            <tbody id="scoringTableBody"></tbody>
+          </table>
         </div>
       </div>
     </div>
 
     <!-- ═══ SECTOR 2: PANEL VENTAS ═══ -->
     <div class="view" id="view-s2-dashboard">
-      <div class="stats-grid">
-        <div class="stat-card s2"><div class="stat-label">Unidades Vendidas (Mes)</div><div class="stat-value">34</div><div class="stat-delta up">▲ 8 vs. oct.</div></div>
-        <div class="stat-card s2"><div class="stat-label">Facturación Bruta</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$42.5M</div><div class="stat-delta up">▲ 15%</div></div>
-        <div class="stat-card s2"><div class="stat-label">Margen Promedio</div><div class="stat-value">18.4%</div><div class="stat-delta up">▲ 1.2 pp</div></div>
-        <div class="stat-card s2"><div class="stat-label">Comisiones Generadas</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$780K</div></div>
-      </div>
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header"><div class="card-title">Ventas por Modelo (Top 5)</div></div>
-          <svg viewBox="0 0 420 200" style="width:100%;height:auto">
-            <!-- Horizontal bars -->
-            <text x="115" y="35" text-anchor="end" class="chart-label" style="font-size:11px">Honda Wave 110</text>
-            <rect x="120" y="22" width="180" height="20" rx="4" fill="#3b82f6" opacity="0.85"/><text x="305" y="36" class="chart-value">12</text>
-            <text x="115" y="68" text-anchor="end" class="chart-label" style="font-size:11px">Bajaj Dominar 250</text>
-            <rect x="120" y="55" width="120" height="20" rx="4" fill="#3b82f6" opacity="0.7"/><text x="245" y="69" class="chart-value">8</text>
-            <text x="115" y="101" text-anchor="end" class="chart-label" style="font-size:11px">Yamaha FZ25</text>
-            <rect x="120" y="88" width="90" height="20" rx="4" fill="#3b82f6" opacity="0.6"/><text x="215" y="102" class="chart-value">6</text>
-            <text x="115" y="134" text-anchor="end" class="chart-label" style="font-size:11px">TVS Apache 200</text>
-            <rect x="120" y="121" width="60" height="20" rx="4" fill="#3b82f6" opacity="0.5"/><text x="185" y="135" class="chart-value">4</text>
-            <text x="115" y="167" text-anchor="end" class="chart-label" style="font-size:11px">Honda CB190R</text>
-            <rect x="120" y="154" width="60" height="20" rx="4" fill="#3b82f6" opacity="0.4"/><text x="185" y="168" class="chart-value">4</text>
-          </svg>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div class="tabs" style="margin-bottom:0">
+          <button class="tab-btn active" onclick="cargarVentas(null, this)">Todas</button>
+          <button class="tab-btn" onclick="cargarVentas('reservada', this)">Reservadas</button>
+          <button class="tab-btn" onclick="cargarVentas('facturada', this)">Facturadas</button>
+          <button class="tab-btn" onclick="cargarVentas('entregada', this)">Entregadas</button>
+          <button class="tab-btn" onclick="cargarVentas('cancelada', this)">Canceladas</button>
         </div>
-        <div class="card">
-          <div class="card-header"><div class="card-title">Comisiones por Vendedor</div></div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Vendedor</th><th>Ventas</th><th>Margen Real</th><th>Comisión</th></tr></thead>
-              <tbody>
-                <tr><td><strong>Sánchez, Pablo</strong></td><td>12</td><td style="font-variant-numeric:tabular-nums">$3.240.000</td><td style="font-variant-numeric:tabular-nums;color:var(--success)">$324.000</td></tr>
-                <tr><td><strong>Méndez, Carolina</strong></td><td>10</td><td style="font-variant-numeric:tabular-nums">$2.680.000</td><td style="font-variant-numeric:tabular-nums;color:var(--success)">$268.000</td></tr>
-                <tr><td><strong>Rojas, Damián</strong></td><td>8</td><td style="font-variant-numeric:tabular-nums">$1.920.000</td><td style="font-variant-numeric:tabular-nums;color:var(--success)">$192.000</td></tr>
-                <tr><td><strong>Vega, Florencia</strong></td><td>4</td><td style="font-variant-numeric:tabular-nums">$890.000</td><td style="font-variant-numeric:tabular-nums;color:var(--success)">$89.000</td></tr>
-              </tbody>
-            </table>
-          </div>
+        <button class="btn btn-primary" onclick="abrirNuevaVenta()">+ Nueva Venta</button>
+      </div>
+      <div id="ventaListLoading" style="text-align:center;padding:40px;color:var(--text-secondary)">Cargando ventas...</div>
+      <div id="ventaTableWrap" class="card" style="padding:0;display:none">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Fecha</th><th>Cliente</th><th>Moto</th><th>Tipo</th><th>Precio</th><th>Seña</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="ventaTableBody"></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -1448,16 +1333,21 @@ tbody tr:hover { background: var(--bg-hover); }
 
     <!-- ═══ SECTOR 2: GESTORÍA ═══ -->
     <div class="view" id="view-s2-gestoria">
-      <div class="card">
-        <div class="card-header"><div class="card-title">Seguimiento de Patentamiento y Documentación</div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div class="tabs" style="margin-bottom:0">
+          <button class="tab-btn active" onclick="cargarTramites(null, this)">Todos</button>
+          <button class="tab-btn" onclick="cargarTramites('en_proceso', this)">En Proceso</button>
+          <button class="tab-btn" onclick="cargarTramites('completado', this)">Completados</button>
+          <button class="tab-btn" onclick="cargarTramites('cancelado', this)">Cancelados</button>
+        </div>
+        <button class="btn btn-primary" onclick="abrirNuevoTramite()">+ Nuevo Trámite</button>
+      </div>
+      <div id="tramiteListLoading" style="text-align:center;padding:40px;color:var(--text-secondary)">Cargando trámites...</div>
+      <div id="tramiteTableWrap" class="card" style="padding:0;display:none">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Unidad</th><th>Comprador</th><th>Form. 01</th><th>Form. 08</th><th>Alta Imp.</th><th>Cédula Verde</th><th>Chapas</th><th>Estado</th></tr></thead>
-            <tbody>
-              <tr><td>Honda Wave 110 — VIN: 9C2</td><td>López, Santiago</td><td><span class="pill green">✓</span></td><td><span class="pill green">✓</span></td><td><span class="pill green">✓</span></td><td><span class="pill yellow">En trám.</span></td><td><span class="pill yellow">En trám.</span></td><td><span class="pill yellow">En proceso</span></td></tr>
-              <tr><td>Bajaj Dominar 250 — VIN: MD2</td><td>Gómez, Andrea</td><td><span class="pill green">✓</span></td><td><span class="pill green">✓</span></td><td><span class="pill yellow">En trám.</span></td><td><span class="pill red">Pend.</span></td><td><span class="pill red">Pend.</span></td><td><span class="pill yellow">En proceso</span></td></tr>
-              <tr><td>Yamaha FZ25 — VIN: MFD</td><td>Herrera, Tomás</td><td><span class="pill green">✓</span></td><td><span class="pill green">✓</span></td><td><span class="pill green">✓</span></td><td><span class="pill green">✓</span></td><td><span class="pill green">✓</span></td><td><span class="pill green">Lista</span></td></tr>
-            </tbody>
+            <thead><tr><th>Fecha</th><th>Moto</th><th>Comprador</th><th>Form. 01</th><th>Form. 08</th><th>Alta Imp.</th><th>Cédula Verde</th><th>Chapas</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="tramiteTableBody"></tbody>
           </table>
         </div>
       </div>
@@ -1579,51 +1469,49 @@ tbody tr:hover { background: var(--bg-hover); }
 
     <!-- ═══ CONTABILIDAD ═══ -->
     <div class="view" id="view-contabilidad">
-      <div class="tabs">
-        <button class="tab-btn active" onclick="switchContab('consolidado')">Consolidado</button>
-        <button class="tab-btn" onclick="switchContab('alquiler')">Sector 1 — Alquiler</button>
-        <button class="tab-btn" onclick="switchContab('ventas')">Sector 2 — Ventas</button>
-        <button class="tab-btn" onclick="switchContab('gps')">Sector 3 — GPS</button>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-card s1"><div class="stat-label">Ingresos Totales (Mes)</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$48.9M</div><div class="stat-delta up">▲ 11%</div></div>
-        <div class="stat-card warn"><div class="stat-label">Egresos Totales</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$38.2M</div></div>
-        <div class="stat-card s3"><div class="stat-label">Resultado Neto</div><div class="stat-value" style="font-variant-numeric:tabular-nums;color:var(--success)">$10.7M</div><div class="stat-delta up">▲ 22% margen</div></div>
-        <div class="stat-card s2"><div class="stat-label">EBITDA</div><div class="stat-value" style="font-variant-numeric:tabular-nums">$12.4M</div></div>
-      </div>
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header"><div class="card-title">P&L por Sector (Noviembre)</div></div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Concepto</th><th>Alquiler</th><th>Ventas</th><th>GPS</th><th>Total</th></tr></thead>
-              <tbody>
-                <tr style="font-weight:600"><td>Ingresos</td><td style="font-variant-numeric:tabular-nums">$5.7M</td><td style="font-variant-numeric:tabular-nums">$42.5M</td><td style="font-variant-numeric:tabular-nums">$2.8M</td><td style="font-variant-numeric:tabular-nums">$48.9M</td></tr>
-                <tr><td>Costo directo</td><td style="font-variant-numeric:tabular-nums">-$1.2M</td><td style="font-variant-numeric:tabular-nums">-$34.8M</td><td style="font-variant-numeric:tabular-nums">-$0.8M</td><td style="font-variant-numeric:tabular-nums">-$36.8M</td></tr>
-                <tr><td>Gastos operativos</td><td style="font-variant-numeric:tabular-nums">-$0.5M</td><td style="font-variant-numeric:tabular-nums">-$0.8M</td><td style="font-variant-numeric:tabular-nums">-$0.4M</td><td style="font-variant-numeric:tabular-nums">-$1.7M</td></tr>
-                <tr style="font-weight:700;border-top:2px solid var(--border)"><td>Resultado</td><td style="color:var(--success);font-variant-numeric:tabular-nums">$4.0M</td><td style="color:var(--success);font-variant-numeric:tabular-nums">$6.9M</td><td style="color:var(--success);font-variant-numeric:tabular-nums">$1.6M</td><td style="color:var(--success);font-variant-numeric:tabular-nums">$10.7M</td></tr>
-              </tbody>
-            </table>
-          </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <h3 style="margin:0;color:var(--text-primary)">Resumen Contable</h3>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select class="form-select" id="contabMes" style="width:auto">
+            <option value="">Mes actual</option>
+            <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option>
+            <option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option>
+            <option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option>
+            <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+          </select>
+          <select class="form-select" id="contabAnio" style="width:auto">
+            <option value="">Año actual</option>
+            <option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="cargarContabilidad()">Consultar</button>
         </div>
-        <div class="card">
-          <div class="card-header"><div class="card-title">Distribución de Ingresos</div></div>
-          <svg viewBox="0 0 300 200" style="width:100%;max-width:300px;margin:0 auto;display:block">
-            <!-- Donut chart -->
-            <circle cx="150" cy="100" r="70" fill="none" stroke="#2a2b38" stroke-width="24"/>
-            <circle cx="150" cy="100" r="70" fill="none" stroke="#6366f1" stroke-width="24"
-              stroke-dasharray="51.2 388" stroke-dashoffset="0" transform="rotate(-90 150 100)"/>
-            <circle cx="150" cy="100" r="70" fill="none" stroke="#3b82f6" stroke-width="24"
-              stroke-dasharray="382 58" stroke-dashoffset="-51.2" transform="rotate(-90 150 100)"/>
-            <circle cx="150" cy="100" r="70" fill="none" stroke="#10b981" stroke-width="24"
-              stroke-dasharray="25.2 415" stroke-dashoffset="-433.2" transform="rotate(-90 150 100)"/>
-            <text x="150" y="95" text-anchor="middle" fill="var(--text-primary)" font-family="var(--font-display)" font-size="20" font-weight="700">$48.9M</text>
-            <text x="150" y="112" text-anchor="middle" fill="var(--text-secondary)" font-size="10">Ingresos totales</text>
-          </svg>
-          <div style="display:flex;gap:20px;justify-content:center;margin-top:12px;font-size:12px;color:var(--text-secondary)">
-            <span><span style="display:inline-block;width:8px;height:8px;background:#6366f1;border-radius:2px;margin-right:6px;vertical-align:middle"></span>Alquiler 12%</span>
-            <span><span style="display:inline-block;width:8px;height:8px;background:#3b82f6;border-radius:2px;margin-right:6px;vertical-align:middle"></span>Ventas 82%</span>
-            <span><span style="display:inline-block;width:8px;height:8px;background:#10b981;border-radius:2px;margin-right:6px;vertical-align:middle"></span>GPS 6%</span>
+      </div>
+      <div id="contabLoading" style="text-align:center;padding:40px;color:var(--text-secondary)">Cargando resumen contable...</div>
+      <div id="contabContent" style="display:none">
+        <div class="stats-grid">
+          <div class="stat-card s1"><div class="stat-label">Ingresos Alquiler</div><div class="stat-value" id="contabIngAlquiler" style="font-variant-numeric:tabular-nums">$0</div></div>
+          <div class="stat-card s2"><div class="stat-label">Ingresos Ventas</div><div class="stat-value" id="contabIngVentas" style="font-variant-numeric:tabular-nums">$0</div></div>
+          <div class="stat-card s3"><div class="stat-label">Ingresos GPS</div><div class="stat-value" id="contabIngGps" style="font-variant-numeric:tabular-nums">$0</div></div>
+          <div class="stat-card"><div class="stat-label">Total Ingresos</div><div class="stat-value" id="contabIngTotal" style="font-variant-numeric:tabular-nums;color:var(--success)">$0</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Detalle por Sector</div></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Concepto</th><th>Alquiler</th><th>Ventas</th><th>GPS</th><th>Total</th></tr></thead>
+                <tbody id="contabTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Indicadores</div></div>
+            <div style="display:flex;flex-direction:column;gap:16px;padding:8px 0" id="contabIndicadores">
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--text-secondary)">Contratos activos</span><span id="contabContratos" style="font-weight:600">0</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--text-secondary)">Ventas del período</span><span id="contabVentasCant" style="font-weight:600">0</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--text-secondary)">Pagos pendientes</span><span id="contabPagosPend" style="font-weight:600;color:var(--warning)">0</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--text-secondary)">Dispositivos GPS activos</span><span id="contabGpsActivos" style="font-weight:600">0</span></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1890,6 +1778,105 @@ tbody tr:hover { background: var(--bg-hover); }
   </div>
 </div>
 
+<!-- ═══ MODAL PAGO ═══ -->
+<div class="modal-overlay" id="modalPago" hidden>
+  <div class="modal" style="max-width:550px">
+    <div class="modal-header"><h2 id="modalPagoTitle">Registrar Pago</h2><button class="modal-close" onclick="closeModal('modalPago')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="pagoId">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group" style="grid-column:1/-1"><label class="form-label">Contrato *</label>
+          <select class="form-input" id="pgContrato"><option value="">Seleccionar contrato...</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Fecha Pago *</label><input class="form-input" id="pgFecha" type="date"></div>
+        <div class="form-group"><label class="form-label">Monto *</label><input class="form-input" id="pgMonto" type="number" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Método *</label>
+          <select class="form-input" id="pgMetodo">
+            <option value="efectivo">Efectivo</option><option value="transferencia">Transferencia</option>
+            <option value="mercadopago">MercadoPago</option><option value="debito_auto">Débito automático</option>
+            <option value="cheque">Cheque</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Estado</label>
+          <select class="form-input" id="pgEstado">
+            <option value="acreditado">Acreditado</option><option value="pendiente">Pendiente</option><option value="rechazado">Rechazado</option>
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1"><label class="form-label">Referencia</label><input class="form-input" id="pgReferencia" placeholder="Nro. comprobante, transferencia, etc."></div>
+      </div>
+      <div id="pagoFormError" class="login-error" style="margin-top:12px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalPago')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarPago()">Guardar Pago</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL VENTA ═══ -->
+<div class="modal-overlay" id="modalVenta" hidden>
+  <div class="modal" style="max-width:650px">
+    <div class="modal-header"><h2 id="modalVentaTitle">Nueva Venta</h2><button class="modal-close" onclick="closeModal('modalVenta')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="ventaId">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group" style="grid-column:1/-1"><label class="form-label">Cliente *</label>
+          <select class="form-input" id="vtCliente"><option value="">Seleccionar cliente...</option></select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1"><label class="form-label">Motovehículo * (disponibles para venta)</label>
+          <select class="form-input" id="vtMoto"><option value="">Seleccionar moto...</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Tipo de Venta *</label>
+          <select class="form-input" id="vtTipo">
+            <option value="contado">Contado</option><option value="financiada">Financiada</option><option value="permuta">Permuta</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Precio Venta *</label><input class="form-input" id="vtPrecio" type="number" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Costo</label><input class="form-input" id="vtCosto" type="number" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Seña / Anticipo</label><input class="form-input" id="vtSenia" type="number" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Comisión Vendedor</label><input class="form-input" id="vtComision" type="number" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Cuotas (si financiada)</label><input class="form-input" id="vtCuotas" type="number" value="1" min="1"></div>
+      </div>
+      <div class="form-group" style="margin-top:12px"><label class="form-label">Notas</label><textarea class="form-input" id="vtNotas" rows="2"></textarea></div>
+      <div id="ventaFormError" class="login-error" style="margin-top:12px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalVenta')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarVenta()">Guardar Venta</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL TRÁMITE ═══ -->
+<div class="modal-overlay" id="modalTramite" hidden>
+  <div class="modal" style="max-width:550px">
+    <div class="modal-header"><h2 id="modalTramiteTitle">Nuevo Trámite</h2><button class="modal-close" onclick="closeModal('modalTramite')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="tramiteId">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group" style="grid-column:1/-1"><label class="form-label">Venta / Moto *</label>
+          <select class="form-input" id="trMoto"><option value="">Seleccionar moto vendida...</option></select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1"><label class="form-label">Comprador *</label>
+          <select class="form-input" id="trCliente"><option value="">Seleccionar cliente...</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Tipo de Trámite</label>
+          <select class="form-input" id="trTipo">
+            <option value="patentamiento">Patentamiento</option><option value="transferencia">Transferencia</option><option value="baja">Baja</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Gestor Asignado</label><input class="form-input" id="trGestor" placeholder="Nombre del gestor"></div>
+      </div>
+      <div class="form-group" style="margin-top:12px"><label class="form-label">Observaciones</label><textarea class="form-input" id="trNotas" rows="2"></textarea></div>
+      <div id="tramiteFormError" class="login-error" style="margin-top:12px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalTramite')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarTramite()">Guardar Trámite</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ TOAST NOTIFICATIONS ═══ -->
 <div class="toast" id="toast"></div>
 
@@ -1943,6 +1930,7 @@ async function handleLogin(e) {
       document.getElementById('appContainer').classList.add('authenticated');
       updateSidebarUser();
       try { sessionStorage.setItem('motogest_auth', JSON.stringify(currentUser)); } catch(ex) {}
+      cargarDashboard();
     } else {
       errorEl.textContent = (result && result.error) || 'Credenciales inválidas';
       errorEl.style.display = 'block';
@@ -2001,6 +1989,7 @@ function logout() {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('appContainer').classList.add('authenticated');
       updateSidebarUser();
+      cargarDashboard();
     }
   } catch(ex) {}
 })();
@@ -2600,28 +2589,440 @@ function switchView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + id)?.classList.add('active');
   document.getElementById('topbarTitle').textContent = viewTitles[id] || id;
-  // Update sidebar active
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => {
     if (n.getAttribute('onclick')?.includes("'" + id + "'")) n.classList.add('active');
   });
-  // Update mobile nav
   document.querySelectorAll('.mobile-nav-item').forEach(n => {
     n.classList.remove('active');
     if (n.getAttribute('onclick')?.includes("'" + id + "'")) n.classList.add('active');
   });
+  // Trigger data loading per section
+  const loaders = {
+    'dashboard': cargarDashboard,
+    'crm': () => { cargarClientes(); cargarMotos(); },
+    's1-dashboard': cargarPanelAlquiler,
+    's1-contratos': () => cargarContratos(),
+    's1-cobranza': () => cargarPagos(),
+    's1-scoring': cargarScoring,
+    's2-dashboard': () => cargarVentas(),
+    's2-stock': () => cargarInventarioAlquiler(),
+    's2-gestoria': () => cargarTramites(),
+    'contabilidad': cargarContabilidad,
+    'config': cargarUsuarios
+  };
+  if (loaders[id]) loaders[id]();
 }
 
 function openModal(id) { document.getElementById(id).hidden = false; }
 function closeModal(id) { document.getElementById(id).hidden = true; }
 
-// Close modal on overlay click
 document.querySelectorAll('.modal-overlay').forEach(ov => {
   ov.addEventListener('click', e => { if (e.target === ov) ov.hidden = true; });
 });
 
-function runScoring() {
-  document.getElementById('scoringResult').hidden = false;
+/* ═══════════════════════════════════════════ */
+/*  DASHBOARD                                  */
+/* ═══════════════════════════════════════════ */
+async function cargarDashboard() {
+  try {
+    const d = await rpc('fn_dashboard_stats');
+    const s = Array.isArray(d) ? d[0] : d;
+    const el = id => document.getElementById(id);
+    if (el('dContratosActivos')) el('dContratosActivos').textContent = s.contratos_activos ?? 0;
+    if (el('dContratosMora')) el('dContratosMora').textContent = s.contratos_mora ?? 0;
+    if (el('dTotalClientes')) el('dTotalClientes').textContent = s.total_clientes ?? 0;
+    if (el('dTotalMotos')) el('dTotalMotos').textContent = s.total_motos ?? 0;
+  } catch (e) { console.error('Dashboard error:', e); }
+}
+
+/* ═══════════════════════════════════════════ */
+/*  PANEL ALQUILER                             */
+/* ═══════════════════════════════════════════ */
+async function cargarPanelAlquiler() {
+  try {
+    const d = await rpc('fn_dashboard_stats');
+    const s = Array.isArray(d) ? d[0] : d;
+    const el = id => document.getElementById(id);
+    if (el('s1ContratosActivos')) el('s1ContratosActivos').textContent = s.contratos_activos ?? 0;
+    if (el('s1MotosAlquiladas')) el('s1MotosAlquiladas').textContent = s.motos_alquiladas ?? 0;
+    if (el('s1ContratosMora')) el('s1ContratosMora').textContent = s.contratos_mora ?? 0;
+    if (el('s1PagosPendientes')) el('s1PagosPendientes').textContent = fmtMoney(s.pagos_pendientes ?? 0);
+    // Load latest contracts table
+    const cts = await rpc('fn_listar_contratos');
+    const loading = document.getElementById('s1UltContratosLoading');
+    const wrap = document.getElementById('s1UltContratosWrap');
+    const body = document.getElementById('s1UltContratosBody');
+    const list = Array.isArray(cts) ? cts.slice(0, 10) : [];
+    body.innerHTML = list.length ? list.map(c => `<tr>
+      <td>${esc(c.cliente_nombre || '—')}</td>
+      <td>${esc(c.moto_descripcion || '—')}</td>
+      <td>${fmtDate(c.fecha_inicio)}</td>
+      <td>${c.cantidad_cuotas || '—'}</td>
+      <td style="font-variant-numeric:tabular-nums">${fmtMoney(c.valor_cuota)}</td>
+      <td><span class="pill ${estadoContratoColor[c.estado] || ''}">${estadoContratoLabel[c.estado] || c.estado}</span></td>
+    </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--text-secondary)">Sin contratos</td></tr>';
+    loading.style.display = 'none'; wrap.style.display = 'block';
+  } catch (e) { console.error('Panel alquiler error:', e); }
+}
+
+/* ═══════════════════════════════════════════ */
+/*  COBRANZA / PAGOS                           */
+/* ═══════════════════════════════════════════ */
+const estadoPagoLabel = { acreditado: 'Acreditado', pendiente: 'Pendiente', rechazado: 'Rechazado' };
+const estadoPagoColor = { acreditado: 'green', pendiente: 'yellow', rechazado: 'red' };
+
+async function cargarPagos(estado, btnEl) {
+  if (btnEl) { btnEl.closest('.tabs').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btnEl.classList.add('active'); }
+  const loading = document.getElementById('pagoListLoading');
+  const wrap = document.getElementById('pagoTableWrap');
+  const body = document.getElementById('pagoTableBody');
+  loading.style.display = 'block'; wrap.style.display = 'none';
+  try {
+    const params = {};
+    if (estado) params.p_estado = estado;
+    const data = await rpc('fn_listar_pagos', params);
+    const list = Array.isArray(data) ? data : [];
+    body.innerHTML = list.length ? list.map(p => `<tr>
+      <td>${fmtDate(p.fecha_pago)}</td>
+      <td>${esc(p.contrato_id?.substring(0,8) || '—')}</td>
+      <td>${esc(p.cliente_nombre || '—')}</td>
+      <td style="font-variant-numeric:tabular-nums">${fmtMoney(p.monto)}</td>
+      <td>${esc(p.metodo_pago || '—')}</td>
+      <td><span class="pill ${estadoPagoColor[p.estado_pago] || ''}">${estadoPagoLabel[p.estado_pago] || p.estado_pago || '—'}</span></td>
+      <td>
+        ${p.estado_pago === 'pendiente' ? `<button class="btn btn-sm btn-primary" onclick="actualizarPago('${p.id}','acreditado')">Acreditar</button>` : ''}
+        ${p.estado_pago === 'pendiente' ? `<button class="btn btn-sm btn-danger" onclick="actualizarPago('${p.id}','rechazado')">Rechazar</button>` : ''}
+      </td>
+    </tr>`).join('') : '<tr><td colspan="7" style="text-align:center;color:var(--text-secondary)">Sin pagos registrados</td></tr>';
+    loading.style.display = 'none'; wrap.style.display = 'block';
+  } catch (err) { loading.textContent = 'Error: ' + err.message; }
+}
+
+async function abrirNuevoPago() {
+  document.getElementById('pagoId').value = '';
+  document.getElementById('pgFecha').value = new Date().toISOString().split('T')[0];
+  document.getElementById('pgMonto').value = '';
+  document.getElementById('pgReferencia').value = '';
+  document.getElementById('pgEstado').value = 'acreditado';
+  document.getElementById('pagoFormError').textContent = '';
+  // Load contracts into select
+  const sel = document.getElementById('pgContrato');
+  sel.innerHTML = '<option value="">Cargando...</option>';
+  try {
+    const cts = await rpc('fn_listar_contratos', { p_estado: 'activo' });
+    const list = Array.isArray(cts) ? cts : [];
+    sel.innerHTML = '<option value="">Seleccionar contrato...</option>' + list.map(c =>
+      `<option value="${c.id}">${esc(c.cliente_nombre)} — ${esc(c.moto_descripcion)}</option>`
+    ).join('');
+  } catch (e) { sel.innerHTML = '<option value="">Error cargando contratos</option>'; }
+  openModal('modalPago');
+}
+
+async function guardarPago() {
+  const contratoId = document.getElementById('pgContrato').value;
+  const fecha = document.getElementById('pgFecha').value;
+  const monto = document.getElementById('pgMonto').value;
+  const metodo = document.getElementById('pgMetodo').value;
+  const estado = document.getElementById('pgEstado').value;
+  const ref = document.getElementById('pgReferencia').value;
+  const errEl = document.getElementById('pagoFormError');
+  if (!contratoId || !fecha || !monto) { errEl.textContent = 'Contrato, fecha y monto son obligatorios'; return; }
+  errEl.textContent = '';
+  try {
+    // We need the client_id from the contract — pass null, the RPC can handle it
+    await rpc('fn_crear_pago', {
+      p_contrato_id: contratoId, p_cliente_id: contratoId, p_fecha_pago: fecha,
+      p_monto: parseFloat(monto), p_metodo_pago: metodo, p_estado_pago: estado, p_referencia: ref || ''
+    });
+    closeModal('modalPago');
+    showToast('Pago registrado correctamente');
+    cargarPagos();
+  } catch (e) { errEl.textContent = e.message; }
+}
+
+async function actualizarPago(id, nuevoEstado) {
+  try {
+    await rpc('fn_actualizar_pago', { p_id: id, p_estado_pago: nuevoEstado });
+    showToast('Pago actualizado');
+    cargarPagos();
+  } catch (e) { showToast('Error: ' + e.message); }
+}
+
+/* ═══════════════════════════════════════════ */
+/*  SCORING / KYC                              */
+/* ═══════════════════════════════════════════ */
+async function cargarScoring() {
+  const loading = document.getElementById('scoringListLoading');
+  const wrap = document.getElementById('scoringTableWrap');
+  const body = document.getElementById('scoringTableBody');
+  loading.style.display = 'block'; wrap.style.display = 'none';
+  try {
+    const data = await rpc('fn_listar_scoring');
+    const list = Array.isArray(data) ? data : [];
+    const pill = v => v ? '<span class="pill green">✓</span>' : '<span class="pill red">✗</span>';
+    const nivelColor = n => ({ alto:'green', medio:'yellow', bajo:'red', muy_bajo:'red' })[n] || '';
+    body.innerHTML = list.length ? list.map(s => `<tr>
+      <td>${esc(s.cliente_nombre || '—')}</td>
+      <td>${esc(s.dni || '—')}</td>
+      <td><strong>${s.score ?? '—'}</strong></td>
+      <td><span class="pill ${nivelColor(s.nivel_riesgo)}">${s.nivel_riesgo || '—'}</span></td>
+      <td>${pill(s.renaper_ok)}</td>
+      <td>${pill(s.veraz_ok)}</td>
+      <td>${pill(s.licencia_ok)}</td>
+      <td>${pill(s.servicio_domiciliario_ok)}</td>
+      <td>${pill(s.selfie_biometrica_ok)}</td>
+      <td>
+        <button class="btn btn-sm btn-secondary" onclick="editarScoring('${s.cliente_id}', ${s.score || 0}, '${s.nivel_riesgo || ''}', ${!!s.renaper_ok}, ${!!s.veraz_ok}, ${!!s.licencia_ok}, ${!!s.servicio_domiciliario_ok}, ${!!s.selfie_biometrica_ok})">Editar</button>
+      </td>
+    </tr>`).join('') : '<tr><td colspan="10" style="text-align:center;color:var(--text-secondary)">Sin datos de scoring</td></tr>';
+    loading.style.display = 'none'; wrap.style.display = 'block';
+  } catch (err) { loading.textContent = 'Error: ' + err.message; }
+}
+
+async function editarScoring(clienteId, score, nivel, renaper, veraz, licencia, servicio, selfie) {
+  const nuevoScore = prompt('Score crediticio (0-1000):', score);
+  if (nuevoScore === null) return;
+  try {
+    await rpc('fn_actualizar_scoring', {
+      p_cliente_id: clienteId, p_score: parseInt(nuevoScore), p_nivel_riesgo: nivel,
+      p_renaper_ok: renaper, p_veraz_ok: veraz, p_licencia_ok: licencia,
+      p_servicio_domiciliario_ok: servicio, p_selfie_biometrica_ok: selfie
+    });
+    showToast('Scoring actualizado');
+    cargarScoring();
+  } catch (e) { showToast('Error: ' + e.message); }
+}
+
+/* ═══════════════════════════════════════════ */
+/*  VENTAS                                     */
+/* ═══════════════════════════════════════════ */
+const estadoVentaLabel = { reservada: 'Reservada', facturada: 'Facturada', entregada: 'Entregada', cancelada: 'Cancelada' };
+const estadoVentaColor = { reservada: 'yellow', facturada: 'blue', entregada: 'green', cancelada: 'red' };
+
+async function cargarVentas(estado, btnEl) {
+  if (btnEl) { btnEl.closest('.tabs').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btnEl.classList.add('active'); }
+  const loading = document.getElementById('ventaListLoading');
+  const wrap = document.getElementById('ventaTableWrap');
+  const body = document.getElementById('ventaTableBody');
+  loading.style.display = 'block'; wrap.style.display = 'none';
+  try {
+    const params = {};
+    if (estado) params.p_estado = estado;
+    const data = await rpc('fn_listar_ventas', params);
+    const list = Array.isArray(data) ? data : [];
+    body.innerHTML = list.length ? list.map(v => `<tr>
+      <td>${fmtDate(v.fecha_venta || v.created_at)}</td>
+      <td>${esc(v.cliente_nombre || '—')}</td>
+      <td>${esc(v.moto_descripcion || '—')}</td>
+      <td>${esc(v.tipo_venta || '—')}</td>
+      <td style="font-variant-numeric:tabular-nums">${fmtMoney(v.precio_venta)}</td>
+      <td style="font-variant-numeric:tabular-nums">${fmtMoney(v.senia)}</td>
+      <td><span class="pill ${estadoVentaColor[v.estado] || ''}">${estadoVentaLabel[v.estado] || v.estado || '—'}</span></td>
+      <td>
+        ${v.estado === 'reservada' ? `<button class="btn btn-sm btn-primary" onclick="cambiarEstadoVenta('${v.id}','facturada')">Facturar</button>` : ''}
+        ${v.estado === 'facturada' ? `<button class="btn btn-sm btn-primary" onclick="cambiarEstadoVenta('${v.id}','entregada')">Entregar</button>` : ''}
+        ${v.estado !== 'cancelada' && v.estado !== 'entregada' ? `<button class="btn btn-sm btn-danger" onclick="cambiarEstadoVenta('${v.id}','cancelada')">Cancelar</button>` : ''}
+      </td>
+    </tr>`).join('') : '<tr><td colspan="8" style="text-align:center;color:var(--text-secondary)">Sin ventas registradas</td></tr>';
+    loading.style.display = 'none'; wrap.style.display = 'block';
+  } catch (err) { loading.textContent = 'Error: ' + err.message; }
+}
+
+async function abrirNuevaVenta() {
+  document.getElementById('ventaId').value = '';
+  document.getElementById('vtPrecio').value = '';
+  document.getElementById('vtCosto').value = '';
+  document.getElementById('vtSenia').value = '';
+  document.getElementById('vtComision').value = '';
+  document.getElementById('vtCuotas').value = '1';
+  document.getElementById('vtNotas').value = '';
+  document.getElementById('ventaFormError').textContent = '';
+  // Load clients & motos
+  const selC = document.getElementById('vtCliente');
+  const selM = document.getElementById('vtMoto');
+  selC.innerHTML = '<option value="">Cargando...</option>';
+  selM.innerHTML = '<option value="">Cargando...</option>';
+  try {
+    const [clientes, motos] = await Promise.all([rpc('fn_listar_clientes'), rpc('fn_listar_motos', { p_sector: 'venta' })]);
+    const cl = Array.isArray(clientes) ? clientes : [];
+    const ml = Array.isArray(motos) ? motos : [];
+    selC.innerHTML = '<option value="">Seleccionar cliente...</option>' + cl.map(c => `<option value="${c.id}">${esc(c.apellido + ', ' + c.nombre)}</option>`).join('');
+    selM.innerHTML = '<option value="">Seleccionar moto...</option>' + ml.map(m => `<option value="${m.id}">${esc(m.marca + ' ' + m.modelo)} — ${esc(m.patente || 'S/P')}</option>`).join('');
+  } catch (e) { console.error(e); }
+  openModal('modalVenta');
+}
+
+async function guardarVenta() {
+  const clienteId = document.getElementById('vtCliente').value;
+  const motoId = document.getElementById('vtMoto').value;
+  const tipo = document.getElementById('vtTipo').value;
+  const precio = document.getElementById('vtPrecio').value;
+  const costo = document.getElementById('vtCosto').value || '0';
+  const senia = document.getElementById('vtSenia').value || '0';
+  const comision = document.getElementById('vtComision').value || '0';
+  const cuotas = document.getElementById('vtCuotas').value || '1';
+  const notas = document.getElementById('vtNotas').value;
+  const errEl = document.getElementById('ventaFormError');
+  if (!clienteId || !motoId || !precio) { errEl.textContent = 'Cliente, moto y precio son obligatorios'; return; }
+  errEl.textContent = '';
+  try {
+    await rpc('fn_crear_venta', {
+      p_cliente_id: clienteId, p_moto_id: motoId, p_vendedor_id: clienteId,
+      p_tipo_venta: tipo, p_precio_venta: parseFloat(precio), p_costo: parseFloat(costo),
+      p_margen: parseFloat(precio) - parseFloat(costo), p_senia: parseFloat(senia),
+      p_cuotas: parseInt(cuotas), p_valor_cuota: parseInt(cuotas) > 1 ? (parseFloat(precio) - parseFloat(senia)) / parseInt(cuotas) : 0,
+      p_comision_vendedor: parseFloat(comision), p_notas: notas, p_con_gestoria: false, p_estado: 'reservada'
+    });
+    closeModal('modalVenta');
+    showToast('Venta registrada correctamente');
+    cargarVentas();
+  } catch (e) { errEl.textContent = e.message; }
+}
+
+async function cambiarEstadoVenta(id, nuevoEstado) {
+  try {
+    await rpc('fn_actualizar_venta', { p_id: id, p_estado: nuevoEstado });
+    showToast('Venta actualizada');
+    cargarVentas();
+  } catch (e) { showToast('Error: ' + e.message); }
+}
+
+/* ═══════════════════════════════════════════ */
+/*  GESTORÍA / TRÁMITES                        */
+/* ═══════════════════════════════════════════ */
+const estadoTramiteLabel = { en_proceso: 'En Proceso', completado: 'Completado', cancelado: 'Cancelado' };
+const estadoTramiteColor = { en_proceso: 'yellow', completado: 'green', cancelado: 'red' };
+
+async function cargarTramites(estado, btnEl) {
+  if (btnEl) { btnEl.closest('.tabs').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btnEl.classList.add('active'); }
+  const loading = document.getElementById('tramiteListLoading');
+  const wrap = document.getElementById('tramiteTableWrap');
+  const body = document.getElementById('tramiteTableBody');
+  loading.style.display = 'block'; wrap.style.display = 'none';
+  try {
+    const params = {};
+    if (estado) params.p_estado = estado;
+    const data = await rpc('fn_listar_tramites', params);
+    const list = Array.isArray(data) ? data : [];
+    const pill = v => v === 'ok' ? '<span class="pill green">✓</span>' : v === 'en_tramite' ? '<span class="pill yellow">En trám.</span>' : '<span class="pill red">Pend.</span>';
+    body.innerHTML = list.length ? list.map(t => `<tr>
+      <td>${fmtDate(t.created_at)}</td>
+      <td>${esc(t.moto_descripcion || '—')}</td>
+      <td>${esc(t.cliente_nombre || '—')}</td>
+      <td>${pill(t.formulario_01)}</td>
+      <td>${pill(t.formulario_08)}</td>
+      <td>${pill(t.alta_impositiva)}</td>
+      <td>${pill(t.cedula_verde)}</td>
+      <td>${pill(t.chapas)}</td>
+      <td><span class="pill ${estadoTramiteColor[t.estado] || ''}">${estadoTramiteLabel[t.estado] || t.estado || '—'}</span></td>
+      <td>
+        <button class="btn btn-sm btn-secondary" onclick="editarTramiteEstado('${t.id}')">Editar</button>
+        ${t.estado === 'en_proceso' ? `<button class="btn btn-sm btn-primary" onclick="completarTramite('${t.id}')">Completar</button>` : ''}
+      </td>
+    </tr>`).join('') : '<tr><td colspan="10" style="text-align:center;color:var(--text-secondary)">Sin trámites registrados</td></tr>';
+    loading.style.display = 'none'; wrap.style.display = 'block';
+  } catch (err) { loading.textContent = 'Error: ' + err.message; }
+}
+
+async function abrirNuevoTramite() {
+  document.getElementById('tramiteId').value = '';
+  document.getElementById('trGestor').value = '';
+  document.getElementById('trNotas').value = '';
+  document.getElementById('tramiteFormError').textContent = '';
+  const selM = document.getElementById('trMoto');
+  const selC = document.getElementById('trCliente');
+  selM.innerHTML = '<option value="">Cargando...</option>';
+  selC.innerHTML = '<option value="">Cargando...</option>';
+  try {
+    const [motos, clientes] = await Promise.all([rpc('fn_listar_motos'), rpc('fn_listar_clientes')]);
+    const ml = Array.isArray(motos) ? motos : [];
+    const cl = Array.isArray(clientes) ? clientes : [];
+    selM.innerHTML = '<option value="">Seleccionar moto...</option>' + ml.map(m => `<option value="${m.id}">${esc(m.marca + ' ' + m.modelo)} — ${esc(m.patente || 'S/P')}</option>`).join('');
+    selC.innerHTML = '<option value="">Seleccionar cliente...</option>' + cl.map(c => `<option value="${c.id}">${esc(c.apellido + ', ' + c.nombre)}</option>`).join('');
+  } catch (e) { console.error(e); }
+  openModal('modalTramite');
+}
+
+async function guardarTramite() {
+  const motoId = document.getElementById('trMoto').value;
+  const clienteId = document.getElementById('trCliente').value;
+  const tipo = document.getElementById('trTipo').value;
+  const gestor = document.getElementById('trGestor').value;
+  const errEl = document.getElementById('tramiteFormError');
+  if (!motoId || !clienteId) { errEl.textContent = 'Moto y cliente son obligatorios'; return; }
+  errEl.textContent = '';
+  try {
+    await rpc('fn_crear_tramite', { p_moto_id: motoId, p_cliente_id: clienteId, p_tipo_tramite: tipo, p_gestor_asignado: gestor || '' });
+    closeModal('modalTramite');
+    showToast('Trámite creado correctamente');
+    cargarTramites();
+  } catch (e) { errEl.textContent = e.message; }
+}
+
+async function editarTramiteEstado(id) {
+  const campo = prompt('¿Qué campo actualizar?\n1=Form.01\n2=Form.08\n3=Alta Imp.\n4=Cédula Verde\n5=Chapas');
+  if (!campo) return;
+  const valor = prompt('Nuevo valor: ok / en_tramite / pendiente');
+  if (!valor) return;
+  const campos = { '1':'p_formulario_01','2':'p_formulario_08','3':'p_alta_impositiva','4':'p_cedula_verde','5':'p_chapas' };
+  const p = campos[campo];
+  if (!p) { showToast('Campo inválido'); return; }
+  try {
+    const params = { p_id: id };
+    params[p] = valor;
+    await rpc('fn_actualizar_tramite', params);
+    showToast('Trámite actualizado');
+    cargarTramites();
+  } catch (e) { showToast('Error: ' + e.message); }
+}
+
+async function completarTramite(id) {
+  try {
+    await rpc('fn_actualizar_tramite', { p_id: id, p_estado: 'completado' });
+    showToast('Trámite completado');
+    cargarTramites();
+  } catch (e) { showToast('Error: ' + e.message); }
+}
+
+/* ═══════════════════════════════════════════ */
+/*  CONTABILIDAD                               */
+/* ═══════════════════════════════════════════ */
+async function cargarContabilidad() {
+  const loading = document.getElementById('contabLoading');
+  const content = document.getElementById('contabContent');
+  loading.style.display = 'block'; content.style.display = 'none';
+  try {
+    const mesVal = document.getElementById('contabMes').value;
+    const anioVal = document.getElementById('contabAnio').value;
+    const params = {};
+    if (mesVal) params.p_mes = parseInt(mesVal);
+    if (anioVal) params.p_anio = parseInt(anioVal);
+    const data = await rpc('fn_resumen_contable', params);
+    const s = Array.isArray(data) ? data[0] : data;
+    const el = id => document.getElementById(id);
+    el('contabIngAlquiler').textContent = fmtMoney(s.ingresos_alquiler ?? 0);
+    el('contabIngVentas').textContent = fmtMoney(s.ingresos_ventas ?? 0);
+    el('contabIngGps').textContent = fmtMoney(s.ingresos_gps ?? 0);
+    const total = (s.ingresos_alquiler ?? 0) + (s.ingresos_ventas ?? 0) + (s.ingresos_gps ?? 0);
+    el('contabIngTotal').textContent = fmtMoney(total);
+    el('contabContratos').textContent = s.contratos_activos ?? 0;
+    el('contabVentasCant').textContent = s.ventas_periodo ?? 0;
+    el('contabPagosPend').textContent = fmtMoney(s.pagos_pendientes ?? 0);
+    el('contabGpsActivos').textContent = s.dispositivos_gps_activos ?? 0;
+    // Table
+    const tbody = el('contabTableBody');
+    tbody.innerHTML = `
+      <tr style="font-weight:600"><td>Ingresos</td><td>${fmtMoney(s.ingresos_alquiler??0)}</td><td>${fmtMoney(s.ingresos_ventas??0)}</td><td>${fmtMoney(s.ingresos_gps??0)}</td><td>${fmtMoney(total)}</td></tr>
+      <tr><td>Egresos</td><td>${fmtMoney(s.egresos_alquiler??0)}</td><td>${fmtMoney(s.egresos_ventas??0)}</td><td>${fmtMoney(s.egresos_gps??0)}</td><td>${fmtMoney((s.egresos_alquiler??0)+(s.egresos_ventas??0)+(s.egresos_gps??0))}</td></tr>
+      <tr style="font-weight:700;border-top:2px solid var(--border)"><td>Resultado</td>
+        <td style="color:var(--success)">${fmtMoney((s.ingresos_alquiler??0)-(s.egresos_alquiler??0))}</td>
+        <td style="color:var(--success)">${fmtMoney((s.ingresos_ventas??0)-(s.egresos_ventas??0))}</td>
+        <td style="color:var(--success)">${fmtMoney((s.ingresos_gps??0)-(s.egresos_gps??0))}</td>
+        <td style="color:var(--success)">${fmtMoney(total-((s.egresos_alquiler??0)+(s.egresos_ventas??0)+(s.egresos_gps??0)))}</td>
+      </tr>`;
+    loading.style.display = 'none'; content.style.display = 'block';
+  } catch (err) { loading.textContent = 'Error: ' + err.message; }
 }
 
 function calcularCredito() {
