@@ -473,6 +473,31 @@ tbody tr:hover { background: var(--bg-hover); }
 .glow-row-green { background: rgba(76,175,80,.08) !important; box-shadow: inset 3px 0 0 #4caf50; animation: pulse 2s infinite; }
 .glow-row-red { background: rgba(244,67,54,.08) !important; box-shadow: inset 3px 0 0 #f44336; animation: pulse 1.5s infinite; }
 
+.glow-orange {
+  background: linear-gradient(135deg, rgba(255,152,0,.15), rgba(255,152,0,.05));
+  border: 1px solid rgba(255,152,0,.3);
+  --glow-color: 0 0 15px rgba(255,152,0,.3), inset 0 0 15px rgba(255,152,0,.1);
+  --glow-color-intense: 0 0 25px rgba(255,152,0,.5), inset 0 0 25px rgba(255,152,0,.2);
+  animation: glowPulse 2.5s ease-in-out infinite;
+  color: #ffb74d;
+}
+.foto-gallery { display:flex; gap:4px; margin-bottom:12px; min-height:60px; }
+.foto-gallery .foto-thumb {
+  width:25%; aspect-ratio:1; border-radius:8px; overflow:hidden; position:relative;
+  background:var(--bg-elevated); display:flex; align-items:center; justify-content:center;
+  cursor:pointer; border:1px solid var(--border);
+}
+.foto-gallery .foto-thumb img { width:100%; height:100%; object-fit:cover; }
+.foto-gallery .foto-thumb .foto-placeholder { font-size:20px; opacity:.3; }
+.foto-gallery .foto-thumb:hover { border-color:var(--accent); }
+.foto-upload-btn {
+  position:absolute; bottom:2px; right:2px; background:var(--accent); color:#fff;
+  border:none; border-radius:50%; width:20px; height:20px; font-size:12px;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:.8;
+}
+.foto-upload-btn:hover { opacity:1; }
+.foto-modal-img { max-width:100%; max-height:70vh; border-radius:8px; }
+
 .map-legend {
   position: absolute; bottom: 16px; left: 16px;
   background: rgba(19,20,27,0.92);
@@ -2711,32 +2736,59 @@ async function cargarInventarioAlquiler() {
     container.innerHTML = '';
     if (data && data.length) {
       data.forEach(item => {
-        const pct = item.plazo_meses > 0 ? Math.round((item.meses_transcurridos / item.plazo_meses) * 100) : 100;
-        const barColor = item.meses_restantes <= 1 ? 'var(--warning)' : item.meses_restantes <= 3 ? 'var(--info)' : 'var(--accent)';
+        const cp = item.cuotas_pagadas || 0;
+        const totalCuotas = item.cantidad_cuotas || 40;
+        const pct = totalCuotas > 0 ? Math.round((cp / totalCuotas) * 100) : 0;
+        // Glow color by cuotas pagadas
+        let glowClass = '';
+        let barColor = 'var(--accent)';
+        if (cp >= 31) { glowClass = 'glow-green'; barColor = '#66bb6a'; }
+        else if (cp >= 21) { glowClass = 'glow-yellow'; barColor = '#ffd54f'; }
+        else if (cp >= 11) { glowClass = 'glow-orange'; barColor = '#ffb74d'; }
+        else { glowClass = 'glow-blue'; barColor = '#64b5f6'; }
+
+        // Photo gallery
+        const fotos = Array.isArray(item.fotos) ? item.fotos : [];
+        let fotosHtml = '<div class="foto-gallery">';
+        for (let i = 0; i < 4; i++) {
+          if (fotos[i]) {
+            fotosHtml += `<div class="foto-thumb" onclick="verFoto('${fotos[i]}')">
+              <img src="${fotos[i]}" alt="Foto ${i+1}">
+            </div>`;
+          } else {
+            fotosHtml += `<div class="foto-thumb" onclick="subirFotoMoto('${item.vehiculo_id}', ${i})">
+              <span class="foto-placeholder">📷</span>
+              <span class="foto-upload-btn">+</span>
+            </div>`;
+          }
+        }
+        fotosHtml += '</div>';
+
         const card = document.createElement('div');
-        card.className = 'card';
+        card.className = 'card ' + glowClass;
         card.innerHTML = `
+          ${fotosHtml}
           <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px">
             <div>
               <div style="font-family:var(--font-display);font-size:15px;font-weight:600">${esc(item.marca)} ${esc(item.modelo)}</div>
-              <div style="font-size:12px;color:var(--text-secondary)">${esc(item.patente || 'S/P')} · ${esc(item.color || '')}</div>
+              <div style="font-size:12px;color:var(--text-secondary)">${esc(item.patente || 'S/P')} · ${esc(item.color || '')} · ${item.anio || ''}</div>
             </div>
             <span class="pill ${item.contrato_estado === 'mora' ? 'red' : 'purple'}">${item.contrato_estado === 'mora' ? 'En mora' : 'En alquiler'}</span>
           </div>
           <div style="font-size:13px;margin-bottom:8px">
             <div style="display:flex;justify-content:space-between"><span style="color:var(--text-secondary)">Cliente:</span> <strong>${esc(item.cliente_nombre)}</strong></div>
             <div style="display:flex;justify-content:space-between"><span style="color:var(--text-secondary)">Contrato:</span> <span>${esc(item.numero_contrato)}</span></div>
-            <div style="display:flex;justify-content:space-between"><span style="color:var(--text-secondary)">Cuota:</span> <span style="font-variant-numeric:tabular-nums">${fmtMoney(item.valor_cuota)}</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text-secondary)">Cuota semanal:</span> <span style="font-variant-numeric:tabular-nums">${fmtMoney(item.valor_cuota)}</span></div>
           </div>
           <div style="margin-top:12px">
             <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
-              <span style="color:var(--text-secondary)">${item.meses_transcurridos} de ${item.plazo_meses} meses</span>
-              <strong style="color:${barColor}">${item.meses_restantes} mes${item.meses_restantes !== 1 ? 'es' : ''} restante${item.meses_restantes !== 1 ? 's' : ''}</strong>
+              <span style="color:var(--text-secondary)">Cuotas pagadas: <strong>${cp}/${totalCuotas}</strong></span>
+              <strong style="color:${barColor}">${totalCuotas - cp} restantes</strong>
             </div>
             <div style="background:var(--bg-elevated);border-radius:6px;height:8px;overflow:hidden">
               <div style="background:${barColor};height:100%;width:${Math.min(pct,100)}%;border-radius:6px;transition:width 0.5s"></div>
             </div>
-            ${item.meses_restantes <= 0 ? '<div style="margin-top:8px;font-size:12px;color:var(--warning);font-weight:600">⚠ Plazo cumplido — pasa a propiedad del cliente</div>' : ''}
+            ${cp >= totalCuotas ? '<div style="margin-top:8px;font-size:12px;color:var(--success);font-weight:600">✅ Todas las cuotas pagadas — pasa a propiedad del cliente</div>' : ''}
           </div>`;
         container.appendChild(card);
       });
@@ -2745,6 +2797,89 @@ async function cargarInventarioAlquiler() {
     }
     loading.style.display = 'none'; wrap.style.display = 'block';
   } catch (err) { loading.textContent = 'Error: ' + err.message; }
+}
+
+// Photo functions
+function subirFotoMoto(vehiculoId, index) {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { showToast('La foto no puede superar 2MB', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      try {
+        const img = new Image();
+        img.onload = async () => {
+          const canvas = document.createElement('canvas');
+          const maxSize = 400;
+          let w = img.width, h = img.height;
+          if (w > h) { if (w > maxSize) { h = h * maxSize / w; w = maxSize; } }
+          else { if (h > maxSize) { w = w * maxSize / h; h = maxSize; } }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          const compressed = canvas.toDataURL('image/jpeg', 0.7);
+          const invData = await rpc('fn_inventario_alquiler');
+          const moto = (Array.isArray(invData) ? invData : []).find(m => m.vehiculo_id === vehiculoId);
+          let fotos = moto && Array.isArray(moto.fotos) ? [...moto.fotos] : [];
+          while (fotos.length < 4) fotos.push(null);
+          fotos[index] = compressed;
+          await rpc('fn_guardar_fotos_moto', { p_vehiculo_id: vehiculoId, p_fotos: JSON.stringify(fotos) });
+          showToast('Foto guardada');
+          cargarInventarioAlquiler();
+        };
+        img.src = ev.target.result;
+      } catch (err) { showToast('Error al guardar foto: ' + err.message, 'error'); }
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function verFoto(src) {
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10000;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:20px';
+  modal.onclick = () => modal.remove();
+  modal.innerHTML = `<img src="${src}" class="foto-modal-img">`;
+  document.body.appendChild(modal);
+}
+
+async function subirFotoMotoDep(vehiculoId, index) {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { showToast('La foto no puede superar 2MB', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      try {
+        const img = new Image();
+        img.onload = async () => {
+          const canvas = document.createElement('canvas');
+          const maxSize = 400;
+          let w = img.width, h = img.height;
+          if (w > h) { if (w > maxSize) { h = h * maxSize / w; w = maxSize; } }
+          else { if (h > maxSize) { w = w * maxSize / h; h = maxSize; } }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          const compressed = canvas.toDataURL('image/jpeg', 0.7);
+          const depData = await rpc('fn_inventario_deposito');
+          const moto = (Array.isArray(depData) ? depData : []).find(m => m.id === vehiculoId);
+          let fotos = moto && Array.isArray(moto.fotos) ? [...moto.fotos] : [];
+          while (fotos.length < 4) fotos.push(null);
+          fotos[index] = compressed;
+          await rpc('fn_guardar_fotos_moto', { p_vehiculo_id: vehiculoId, p_fotos: JSON.stringify(fotos) });
+          showToast('Foto guardada');
+          cargarInventarioDeposito();
+        };
+        img.src = ev.target.result;
+      } catch (err) { showToast('Error al guardar foto: ' + err.message, 'error'); }
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
 }
 
 async function cargarInventarioDeposito() {
@@ -2759,7 +2894,18 @@ async function cargarInventarioDeposito() {
       data.forEach(m => {
         const card = document.createElement('div');
         card.className = 'moto-card';
+        const fotosD = Array.isArray(m.fotos) ? m.fotos : [];
+        let fotosDepHtml = '<div class="foto-gallery">';
+        for (let fi = 0; fi < 4; fi++) {
+          if (fotosD[fi]) {
+            fotosDepHtml += `<div class="foto-thumb" onclick="verFoto('${fotosD[fi]}')"><img src="${fotosD[fi]}" alt="Foto ${fi+1}"></div>`;
+          } else {
+            fotosDepHtml += `<div class="foto-thumb" onclick="subirFotoMotoDep('${m.id}', ${fi})"><span class="foto-placeholder">📷</span><span class="foto-upload-btn">+</span></div>`;
+          }
+        }
+        fotosDepHtml += '</div>';
         card.innerHTML = `
+          ${fotosDepHtml}
           <div class="moto-img">🏍️<div class="moto-status"><span class="pill ${estadoMotoColor[m.estado] || 'green'}">${estadoMotoLabel[m.estado] || m.estado}</span></div></div>
           <div class="moto-body">
             <div class="moto-brand">${esc(m.marca)}</div>
