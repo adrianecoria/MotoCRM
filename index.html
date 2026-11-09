@@ -1275,7 +1275,7 @@ tbody tr:hover { background: var(--bg-hover); }
         </div>
         <div class="glow-card glow-purple">
           <div class="glow-number" id="statRecaudacionTotal">$0</div>
-          <div class="glow-label">💎 Recaudación Total de Cuotas</div>
+          <div class="glow-label">💎 Recaudación Total de Todas las Cuotas</div>
         </div>
       </div>
 
@@ -2929,12 +2929,16 @@ async function cargarCobranzaTab(tab, btnEl) {
       document.getElementById('statCuotasPendientes').textContent = pend5d;
       document.getElementById('statCuotasVencidas').textContent = vencMora;
       document.getElementById('statMontoRecaudar').textContent = fmtMoney(montoTotal);
-      // Fetch pagadas count + recaudación total async
-      rpc('fn_cobranza_acreditados').then(d => {
-        const arr = Array.isArray(d) ? d : [];
-        document.getElementById('statCuotasPagadas').textContent = arr.length;
-        const totalRecaudado = arr.reduce((s, c) => s + parseFloat(c.monto_total || 0), 0);
-        document.getElementById('statRecaudacionTotal').textContent = fmtMoney(totalRecaudado);
+      // Fetch pagadas + recaudación total de todas las cuotas
+      Promise.all([
+        rpc('fn_cobranza_acreditados'),
+        rpc('fn_cobranza_todas')
+      ]).then(([pagadas, todas]) => {
+        const arrPag = Array.isArray(pagadas) ? pagadas : [];
+        document.getElementById('statCuotasPagadas').textContent = arrPag.length;
+        const arrTodas = Array.isArray(todas) ? todas : [];
+        const totalCuotas = arrTodas.reduce((s, c) => s + parseFloat(c.monto_total || 0), 0);
+        document.getElementById('statRecaudacionTotal').textContent = fmtMoney(totalCuotas);
       }).catch(() => {});
     }
 
