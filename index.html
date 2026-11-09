@@ -40,7 +40,6 @@ body {
   font-size: 14px;
   line-height: 1.5;
   margin: 0;
-  display: flex;
   height: 100vh;
   overflow: hidden;
   padding-left: max(0px, env(safe-area-inset-left, 0px));
@@ -638,7 +637,166 @@ tbody tr:hover { background: var(--bg-hover); }
 .moto-specs { display: flex; gap: 12px; margin-top: 8px; font-size: 11px; color: var(--text-secondary); }
 .moto-price { font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-top: 10px; color: var(--accent); }
 .moto-price .moto-cost { font-size: 11px; color: var(--text-muted); font-weight: 400; display: block; font-family: var(--font-body); }
+/* ── Login Screen ── */
+.login-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+}
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 48px 40px 40px;
+  text-align: center;
+  box-shadow: 0 0 80px rgba(99,102,241,0.08), 0 24px 48px rgba(0,0,0,0.4);
+}
+.login-logo {
+  width: 64px; height: 64px;
+  background: var(--gradient-1);
+  border-radius: 16px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 700; color: #fff;
+  margin-bottom: 20px;
+  box-shadow: 0 0 40px var(--accent-glow);
+}
+.login-card h2 {
+  font-family: var(--font-display);
+  font-size: 24px; font-weight: 700;
+  margin: 0 0 4px;
+  letter-spacing: -0.02em;
+}
+.login-card .login-subtitle {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 32px;
+}
+.login-field {
+  position: relative;
+  margin-bottom: 16px;
+  text-align: left;
+}
+.login-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.login-field input {
+  width: 100%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: var(--font-body);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+.login-field input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.login-field input::placeholder { color: var(--text-muted); }
+.login-field .toggle-password {
+  position: absolute;
+  right: 12px; bottom: 11px;
+  background: none; border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px;
+}
+.login-field .toggle-password:hover { color: var(--text-secondary); }
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--gradient-1);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: opacity 0.15s, box-shadow 0.15s;
+  letter-spacing: -0.01em;
+}
+.login-btn:hover {
+  opacity: 0.92;
+  box-shadow: 0 4px 24px var(--accent-glow);
+}
+.login-btn:active { transform: scale(0.985); }
+.login-error {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.25);
+  color: var(--danger);
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: var(--radius-xs);
+  margin-bottom: 16px;
+  display: none;
+  text-align: left;
+}
+.login-footer {
+  margin-top: 24px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.app-container {
+  display: none;
+  width: 100%;
+  height: 100vh;
+}
+.app-container.authenticated {
+  display: flex;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(10px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
 </style>
+
+<!-- ═══════════════════ LOGIN SCREEN ═══════════════════ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">M</div>
+    <h2>MotoGest</h2>
+    <p class="login-subtitle">CRM & Gestión Integral de Motovehículos</p>
+    <div class="login-error" id="loginError">Usuario o contraseña incorrectos.</div>
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="login-field">
+        <label for="loginUser">Usuario</label>
+        <input type="text" id="loginUser" placeholder="Ingresá tu usuario" autocomplete="username" required autofocus>
+      </div>
+      <div class="login-field">
+        <label for="loginPass">Contraseña</label>
+        <input type="password" id="loginPass" placeholder="Ingresá tu contraseña" autocomplete="current-password" required>
+        <button type="button" class="toggle-password" onclick="togglePassword()" aria-label="Mostrar contraseña" id="togglePassBtn">👁</button>
+      </div>
+      <button type="submit" class="login-btn">Iniciar Sesión</button>
+    </form>
+    <p class="login-footer">© 2026 MotoGest — Acceso exclusivo para personal autorizado</p>
+  </div>
+</div>
+
+<!-- ═══════════════════ APP CONTAINER ═══════════════════ -->
+<div class="app-container" id="appContainer">
 
 <!-- ═══════════════════ SIDEBAR ═══════════════════ -->
 <aside class="sidebar">
@@ -731,12 +889,15 @@ tbody tr:hover { background: var(--bg-hover); }
   </div>
 
   <div class="sidebar-footer">
-    <div class="user-info">
-      <div class="user-avatar">AC</div>
-      <div class="user-details">
-        <div class="user-name">Adrián Coria</div>
-        <div class="user-role">Administrador</div>
+    <div class="user-info" style="justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="user-avatar">AC</div>
+        <div class="user-details">
+          <div class="user-name">Adrián Coria</div>
+          <div class="user-role">Administrador</div>
+        </div>
       </div>
+      <button onclick="logout()" title="Cerrar Sesión" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:6px;border-radius:var(--radius-xs);transition:all 0.15s" onmouseover="this.style.color='var(--danger)';this.style.background='rgba(239,68,68,0.1)'" onmouseout="this.style.color='var(--text-muted)';this.style.background='none'">⏻</button>
     </div>
   </div>
 </aside>
@@ -1622,13 +1783,15 @@ tbody tr:hover { background: var(--bg-hover); }
 </div><!-- /main -->
 
 <!-- ═══ MOBILE NAV ═══ -->
-<div class="mobile-nav">
+<div class="mobile-nav" id="mobileNav">
   <button class="mobile-nav-item active" onclick="switchView('dashboard')"><span class="mn-icon">📊</span>Panel</button>
   <button class="mobile-nav-item" onclick="switchView('s1-dashboard')"><span class="mn-icon">📋</span>Alquiler</button>
   <button class="mobile-nav-item" onclick="switchView('s2-dashboard')"><span class="mn-icon">🏪</span>Ventas</button>
   <button class="mobile-nav-item" onclick="switchView('s3-mapa')"><span class="mn-icon">🗺️</span>GPS</button>
   <button class="mobile-nav-item" onclick="switchView('crm')"><span class="mn-icon">👤</span>CRM</button>
 </div>
+
+</div><!-- /app-container -->
 
 <!-- ═══ MODAL: NUEVO CLIENTE ═══ -->
 <div class="modal-overlay" id="modalCliente" hidden>
@@ -1682,6 +1845,64 @@ tbody tr:hover { background: var(--bg-hover); }
 </div>
 
 <script>
+// ═══ AUTENTICACIÓN ═══
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'MotoGest2026';
+
+function handleLogin(e) {
+  e.preventDefault();
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const errorEl = document.getElementById('loginError');
+
+  if (user === ADMIN_USER && pass === ADMIN_PASS) {
+    errorEl.style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appContainer').classList.add('authenticated');
+    try { sessionStorage.setItem('motogest_auth', '1'); } catch(ex) {}
+  } else {
+    errorEl.style.display = 'block';
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginPass').focus();
+    // Shake animation
+    const card = document.querySelector('.login-card');
+    card.style.animation = 'shake 0.4s ease';
+    setTimeout(() => card.style.animation = '', 400);
+  }
+}
+
+function togglePassword() {
+  const inp = document.getElementById('loginPass');
+  const btn = document.getElementById('togglePassBtn');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    btn.textContent = '🔒';
+  } else {
+    inp.type = 'password';
+    btn.textContent = '👁';
+  }
+}
+
+function logout() {
+  try { sessionStorage.removeItem('motogest_auth'); } catch(ex) {}
+  document.getElementById('appContainer').classList.remove('authenticated');
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').style.display = 'none';
+  document.getElementById('loginUser').focus();
+}
+
+// Auto-login if session is still active
+(function checkSession() {
+  try {
+    if (sessionStorage.getItem('motogest_auth') === '1') {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('appContainer').classList.add('authenticated');
+    }
+  } catch(ex) {}
+})();
+
 const viewTitles = {
   'dashboard': 'Dashboard Global',
   'crm': 'CRM Unificado',
