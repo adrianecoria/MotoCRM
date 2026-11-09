@@ -1191,31 +1191,53 @@ tbody tr:hover { background: var(--bg-hover); }
 
     <!-- ═══ SECTOR 1: COBRANZA ═══ -->
     <div class="view" id="view-s1-cobranza">
-      <!-- Mini panel de alertas 24h -->
+      <!-- ═══ MINI DASHBOARD ALERTAS 24h ═══ -->
       <div id="alertasCuotas24h" class="card" style="margin-bottom:16px;border-left:4px solid var(--warning);display:none">
-        <div style="display:flex;align-items:center;gap:8px;padding:12px 16px">
-          <span style="font-size:20px">⚠️</span>
-          <div>
-            <strong style="color:var(--warning)">Cuotas próximas a vencer (24h)</strong>
-            <div id="alertasCuotasBody" style="margin-top:6px;font-size:13px;color:var(--text-secondary)"></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px">
+          <span style="font-size:24px;animation:pulse 2s infinite">🔔</span>
+          <div style="flex:1">
+            <strong style="color:var(--warning);font-size:15px">⚠️ Cuotas próximas a vencer (24 horas)</strong>
+            <div id="alertasCuotasCount" style="font-size:13px;color:var(--text-secondary);margin-top:2px"></div>
           </div>
         </div>
+        <div id="alertasCuotasBody" style="padding:0 16px 14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px"></div>
       </div>
+
+      <!-- ═══ STATS DE COBRANZA ═══ -->
+      <div id="cobranzaStats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px">
+        <div class="stat-card"><div class="stat-number" id="statCuotasPendientes">0</div><div class="stat-label">Pendientes</div></div>
+        <div class="stat-card"><div class="stat-number" id="statCuotasVencidas" style="color:var(--danger)">0</div><div class="stat-label">Vencidas/Mora</div></div>
+        <div class="stat-card"><div class="stat-number" id="statCuotasPagadas" style="color:var(--success)">0</div><div class="stat-label">Pagadas</div></div>
+        <div class="stat-card"><div class="stat-number" id="statMontoRecaudar">$0</div><div class="stat-label">Por Recaudar</div></div>
+      </div>
+
+      <!-- ═══ TABS ═══ -->
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
         <div class="tabs" style="margin-bottom:0">
-          <button class="tab-btn active" onclick="cargarPagos('pendiente', this)">Pendientes</button>
-          <button class="tab-btn" onclick="cargarPagos('acreditado', this)">Acreditados</button>
-          <button class="tab-btn" onclick="cargarPagos('rechazado', this)">Rechazados</button>
-          <button class="tab-btn" onclick="cargarPagos(null, this)">Todos</button>
+          <button class="tab-btn active" onclick="cargarCobranzaTab('pendientes', this)">Pendientes</button>
+          <button class="tab-btn" onclick="cargarCobranzaTab('acreditados', this)">Acreditados</button>
+          <button class="tab-btn" onclick="cargarCobranzaTab('rechazados', this)">Rechazados</button>
+          <button class="tab-btn" onclick="cargarCobranzaTab('todos', this)">Todos</button>
         </div>
-        <button class="btn btn-primary" onclick="abrirNuevoPago()">+ Registrar Pago</button>
       </div>
-      <div id="pagoListLoading" style="text-align:center;padding:40px;color:var(--text-secondary)">Cargando pagos...</div>
-      <div id="pagoTableWrap" class="card" style="padding:0;display:none">
+
+      <!-- ═══ TABLA ═══ -->
+      <div id="cobranzaLoading" style="text-align:center;padding:40px;color:var(--text-secondary)">Cargando cuotas...</div>
+      <div id="cobranzaTableWrap" class="card" style="padding:0;display:none">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Fecha</th><th>Contrato</th><th>Cliente</th><th>Monto</th><th>Método</th><th>Estado</th><th>Acciones</th></tr></thead>
-            <tbody id="pagoTableBody"></tbody>
+            <thead><tr>
+              <th>Vencimiento</th>
+              <th>Contrato</th>
+              <th>Cliente</th>
+              <th>CUIL</th>
+              <th>Moto</th>
+              <th>Cuota</th>
+              <th>Monto</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr></thead>
+            <tbody id="cobranzaTableBody"></tbody>
           </table>
         </div>
       </div>
@@ -2710,7 +2732,7 @@ function switchView(id) {
     'crm': () => { cargarClientes(); cargarMotos(); },
     's1-dashboard': cargarPanelAlquiler,
     's1-contratos': () => cargarContratos(),
-    's1-cobranza': () => cargarPagos('pendiente'),
+    's1-cobranza': () => cargarCobranzaTab('pendientes'),
     's1-scoring': cargarScoring,
     's2-dashboard': () => cargarVentas(),
     's2-stock': () => cargarInventarioAlquiler(),
@@ -2796,108 +2818,130 @@ async function cargarPanelAlquiler() {
 }
 
 /* ═══════════════════════════════════════════ */
-/*  COBRANZA / PAGOS                           */
+/*  COBRANZA — sistema basado en cuotas_alquiler */
 /* ═══════════════════════════════════════════ */
+const estadoCuotaLabel = { pendiente: 'Pendiente', pagada: 'Pagada', vencida: 'Vencida', en_mora: 'En Mora', anulada: 'Anulada' };
+const estadoCuotaColor = { pendiente: 'yellow', pagada: 'green', vencida: 'red', en_mora: 'red', anulada: 'gray' };
+// Keep old labels for backward compat
 const estadoPagoLabel = { acreditado: 'Acreditado', pendiente: 'Pendiente', rechazado: 'Rechazado' };
 const estadoPagoColor = { acreditado: 'green', pendiente: 'yellow', rechazado: 'red' };
 
-async function cargarPagos(estado, btnEl) {
-  if (btnEl) { btnEl.closest('.tabs').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btnEl.classList.add('active'); }
-  const loading = document.getElementById('pagoListLoading');
-  const wrap = document.getElementById('pagoTableWrap');
-  const body = document.getElementById('pagoTableBody');
+let cobranzaTabActual = 'pendientes';
+
+async function cargarCobranzaTab(tab, btnEl) {
+  if (btnEl) {
+    btnEl.closest('.tabs').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btnEl.classList.add('active');
+  }
+  cobranzaTabActual = tab;
+  const loading = document.getElementById('cobranzaLoading');
+  const wrap = document.getElementById('cobranzaTableWrap');
+  const body = document.getElementById('cobranzaTableBody');
   loading.style.display = 'block'; wrap.style.display = 'none';
+
   try {
-    const params = {};
-    if (estado) params.p_estado = estado;
-    const data = await rpc('fn_listar_pagos', params);
+    const fnMap = {
+      pendientes: 'fn_cobranza_pendientes',
+      acreditados: 'fn_cobranza_acreditados',
+      rechazados: 'fn_cobranza_rechazados',
+      todos: 'fn_cobranza_todas'
+    };
+    const data = await rpc(fnMap[tab] || 'fn_cobranza_pendientes');
     let list = Array.isArray(data) ? data : [];
-    // Sort pendientes by fecha_pago (nearest first)
-    if (estado === 'pendiente') {
-      list.sort((a, b) => (a.fecha_pago || '').localeCompare(b.fecha_pago || ''));
-    }
-    // 24h alert panel — check pending payments due within 24h
+
+    // ═══ Mini dashboard alertas 24h ═══
     const alertPanel = document.getElementById('alertasCuotas24h');
     const alertBody = document.getElementById('alertasCuotasBody');
-    if (estado === 'pendiente' || !estado) {
-      const now = new Date();
-      const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-      const pendientes24h = list.filter(p => {
-        if (p.estado_pago !== 'pendiente' || !p.fecha_pago) return false;
-        const fp = new Date(p.fecha_pago + 'T23:59:59');
-        return fp >= now && fp <= in24h;
+    const alertCount = document.getElementById('alertasCuotasCount');
+    if (tab === 'pendientes') {
+      const cuotas24h = list.filter(c => {
+        const h = parseFloat(c.horas_para_vencer);
+        return h >= -2 && h <= 24; // include slightly overdue too
       });
-      if (pendientes24h.length) {
-        alertBody.innerHTML = pendientes24h.map(p =>
-          `<div style="padding:3px 0">🔔 <strong>${esc(p.cliente_nombre || '—')}</strong> — ${fmtMoney(p.monto)} — vence ${fmtDate(p.fecha_pago)}</div>`
-        ).join('');
+      if (cuotas24h.length) {
+        alertCount.textContent = cuotas24h.length + ' cuota' + (cuotas24h.length > 1 ? 's' : '') + ' por vencer en las próximas 24 horas';
+        alertBody.innerHTML = cuotas24h.map(c => `
+          <div style="background:var(--bg-secondary);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+            <div>
+              <div style="font-weight:600;font-size:14px">${esc(c.cliente_nombre)}</div>
+              <div style="font-size:12px;color:var(--text-secondary)">${esc(c.moto_descripcion)} — ${esc(c.numero_contrato)} — Cuota ${c.numero_cuota}/${c.cantidad_cuotas}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:700;font-size:15px;color:var(--warning)">${fmtMoney(c.monto_total)}</div>
+              <div style="font-size:11px;color:var(--text-secondary)">Vence ${fmtDate(c.fecha_vencimiento)}</div>
+            </div>
+          </div>
+        `).join('');
         alertPanel.style.display = 'block';
       } else { alertPanel.style.display = 'none'; }
     } else { alertPanel.style.display = 'none'; }
-    body.innerHTML = list.length ? list.map(p => `<tr>
-      <td>${fmtDate(p.fecha_pago)}</td>
-      <td>${esc(p.contrato_id?.substring(0,8) || '—')}</td>
-      <td>${esc(p.cliente_nombre || '—')}</td>
-      <td style="font-variant-numeric:tabular-nums">${fmtMoney(p.monto)}</td>
-      <td>${esc(p.metodo_pago || '—')}</td>
-      <td><span class="pill ${estadoPagoColor[p.estado_pago] || ''}">${estadoPagoLabel[p.estado_pago] || p.estado_pago || '—'}</span></td>
-      <td>
-        ${p.estado_pago === 'pendiente' ? `<button class="btn btn-sm btn-primary" onclick="actualizarPago('${p.id}','acreditado')">Acreditar</button>` : ''}
-        ${p.estado_pago === 'pendiente' ? `<button class="btn btn-sm btn-danger" onclick="actualizarPago('${p.id}','rechazado')">Rechazar</button>` : ''}
-      </td>
-    </tr>`).join('') : '<tr><td colspan="7" style="text-align:center;color:var(--text-secondary)">Sin pagos registrados</td></tr>';
+
+    // ═══ Stats ═══
+    if (tab === 'pendientes') {
+      const pend = list.filter(c => c.cuota_estado === 'pendiente').length;
+      const venc = list.filter(c => c.cuota_estado === 'vencida' || c.cuota_estado === 'en_mora').length;
+      const montoTotal = list.reduce((s, c) => s + parseFloat(c.monto_total || 0), 0);
+      document.getElementById('statCuotasPendientes').textContent = pend;
+      document.getElementById('statCuotasVencidas').textContent = venc;
+      document.getElementById('statMontoRecaudar').textContent = fmtMoney(montoTotal);
+    }
+
+    // ═══ Tabla ═══
+    if (list.length) {
+      body.innerHTML = list.map(c => {
+        const horas = parseFloat(c.horas_para_vencer || 999);
+        const esUrgente = horas >= 0 && horas <= 24;
+        const estaVencida = horas < 0;
+        const rowStyle = esUrgente ? 'background:rgba(255,193,7,0.08)' : (estaVencida ? 'background:rgba(244,67,54,0.06)' : '');
+        const estadoKey = c.cuota_estado || 'pendiente';
+        return `<tr style="${rowStyle}">
+          <td>${esUrgente ? '⚠️ ' : (estaVencida ? '🔴 ' : '')}${fmtDate(c.fecha_vencimiento)}</td>
+          <td><strong>${esc(c.numero_contrato)}</strong></td>
+          <td>${esc(c.cliente_nombre)}</td>
+          <td>${esc(c.cliente_cuit || c.cliente_dni || '—')}</td>
+          <td>${esc(c.moto_descripcion)}${c.moto_patente ? ' <span style="color:var(--text-secondary);font-size:12px">('+esc(c.moto_patente)+')</span>' : ''}</td>
+          <td>${c.numero_cuota}/${c.cantidad_cuotas}</td>
+          <td style="font-variant-numeric:tabular-nums;font-weight:600">${fmtMoney(c.monto_total)}</td>
+          <td><span class="pill ${estadoCuotaColor[estadoKey] || 'blue'}">${estadoCuotaLabel[estadoKey] || estadoKey}</span></td>
+          <td>
+            <div class="user-actions-cell">
+              ${['pendiente','en_mora','vencida'].includes(estadoKey) ? `<button class="btn btn-sm btn-primary" onclick="acreditarCuota('${c.id}')" title="Acreditar pago">✅ Cobrar</button>` : ''}
+              ${['pendiente','en_mora','vencida'].includes(estadoKey) ? `<button class="btn btn-sm btn-danger" onclick="rechazarCuota('${c.id}')" title="Rechazar/Anular">❌</button>` : ''}
+              ${estadoKey === 'pagada' ? `<span style="color:var(--success);font-size:13px">✓ Pagada${c.fecha_pago ? ' ' + fmtDate(c.fecha_pago) : ''}</span>` : ''}
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+    } else {
+      body.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-secondary);padding:24px">No hay cuotas en esta categoría</td></tr>';
+    }
     loading.style.display = 'none'; wrap.style.display = 'block';
   } catch (err) { loading.textContent = 'Error: ' + err.message; }
 }
 
-async function abrirNuevoPago() {
-  document.getElementById('pagoId').value = '';
-  document.getElementById('pgFecha').value = new Date().toISOString().split('T')[0];
-  document.getElementById('pgMonto').value = '';
-  document.getElementById('pgReferencia').value = '';
-  document.getElementById('pgEstado').value = 'acreditado';
-  document.getElementById('pagoFormError').textContent = '';
-  // Load contracts into select
-  const sel = document.getElementById('pgContrato');
-  sel.innerHTML = '<option value="">Cargando...</option>';
+async function acreditarCuota(cuotaId) {
+  if (!confirm('¿Confirmar cobro de esta cuota?')) return;
   try {
-    const cts = await rpc('fn_listar_contratos', { p_estado: 'activo' });
-    const list = Array.isArray(cts) ? cts : [];
-    sel.innerHTML = '<option value="">Seleccionar contrato...</option>' + list.map(c =>
-      `<option value="${c.id}">${esc(c.cliente_nombre)} — ${esc(c.moto_descripcion)}</option>`
-    ).join('');
-  } catch (e) { sel.innerHTML = '<option value="">Error cargando contratos</option>'; }
-  openModal('modalPago');
+    const r = await rpc('fn_acreditar_cuota', { p_cuota_id: cuotaId });
+    if (r && r.ok) { showToast('Cuota cobrada correctamente'); cargarCobranzaTab(cobranzaTabActual); }
+    else showToast((r && r.error) || 'Error al acreditar', 'error');
+  } catch (e) { showToast('Error: ' + e.message, 'error'); }
 }
 
-async function guardarPago() {
-  const contratoId = document.getElementById('pgContrato').value;
-  const fecha = document.getElementById('pgFecha').value;
-  const monto = document.getElementById('pgMonto').value;
-  const metodo = document.getElementById('pgMetodo').value;
-  const estado = document.getElementById('pgEstado').value;
-  const ref = document.getElementById('pgReferencia').value;
-  const errEl = document.getElementById('pagoFormError');
-  if (!contratoId || !fecha || !monto) { errEl.textContent = 'Contrato, fecha y monto son obligatorios'; return; }
-  errEl.textContent = '';
+async function rechazarCuota(cuotaId) {
+  if (!confirm('¿Anular esta cuota?')) return;
   try {
-    // We need the client_id from the contract — pass null, the RPC can handle it
-    await rpc('fn_crear_pago', {
-      p_contrato_id: contratoId, p_cliente_id: contratoId, p_fecha_pago: fecha,
-      p_monto: parseFloat(monto), p_metodo_pago: metodo, p_estado_pago: estado, p_referencia: ref || ''
-    });
-    closeModal('modalPago');
-    showToast('Pago registrado correctamente');
-    cargarPagos();
-  } catch (e) { errEl.textContent = e.message; }
+    const r = await rpc('fn_rechazar_cuota', { p_cuota_id: cuotaId });
+    if (r && r.ok) { showToast('Cuota anulada'); cargarCobranzaTab(cobranzaTabActual); }
+    else showToast((r && r.error) || 'Error al anular', 'error');
+  } catch (e) { showToast('Error: ' + e.message, 'error'); }
 }
 
+// Keep old pago functions for backward compat
+async function cargarPagos(estado, btnEl) { cargarCobranzaTab(estado === 'pendiente' ? 'pendientes' : estado === 'acreditado' ? 'acreditados' : estado === 'rechazado' ? 'rechazados' : 'todos', btnEl); }
 async function actualizarPago(id, nuevoEstado) {
-  try {
-    await rpc('fn_actualizar_pago', { p_id: id, p_estado_pago: nuevoEstado });
-    showToast('Pago actualizado');
-    cargarPagos();
-  } catch (e) { showToast('Error: ' + e.message); }
+  if (nuevoEstado === 'acreditado') acreditarCuota(id);
+  else rechazarCuota(id);
 }
 
 /* ═══════════════════════════════════════════ */
