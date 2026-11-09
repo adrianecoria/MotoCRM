@@ -402,10 +402,66 @@ tbody tr:hover { background: var(--bg-hover); }
 .map-dot.stopped { background: var(--warning); box-shadow: 0 0 12px rgba(245,158,11,0.3); }
 .map-dot.alert { background: var(--danger); box-shadow: 0 0 12px rgba(239,68,68,0.5); animation: pulse 1.5s infinite; }
 .map-dot.offline { background: var(--text-muted); }
-@keyframes pulse {
-  0%,100% { box-shadow: 0 0 12px rgba(239,68,68,0.5); }
-  50% { box-shadow: 0 0 24px rgba(239,68,68,0.8); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+@keyframes glowPulse { 0%,100%{box-shadow:var(--glow-color)} 50%{box-shadow:var(--glow-color-intense)} }
+
+.glow-card {
+  border-radius: 14px;
+  padding: 20px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform .2s;
 }
+.glow-card:hover { transform: translateY(-2px); }
+.glow-card .glow-number { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
+.glow-card .glow-label { font-size: 13px; margin-top: 4px; opacity: .85; font-weight: 500; }
+
+.glow-blue {
+  background: linear-gradient(135deg, rgba(33,150,243,.15), rgba(33,150,243,.05));
+  border: 1px solid rgba(33,150,243,.3);
+  --glow-color: 0 0 15px rgba(33,150,243,.3), inset 0 0 15px rgba(33,150,243,.1);
+  --glow-color-intense: 0 0 25px rgba(33,150,243,.5), inset 0 0 25px rgba(33,150,243,.2);
+  animation: glowPulse 2.5s ease-in-out infinite;
+  color: #64b5f6;
+}
+.glow-red {
+  background: linear-gradient(135deg, rgba(244,67,54,.15), rgba(244,67,54,.05));
+  border: 1px solid rgba(244,67,54,.3);
+  --glow-color: 0 0 15px rgba(244,67,54,.3), inset 0 0 15px rgba(244,67,54,.1);
+  --glow-color-intense: 0 0 25px rgba(244,67,54,.5), inset 0 0 25px rgba(244,67,54,.2);
+  animation: glowPulse 2s ease-in-out infinite;
+  color: #ef5350;
+}
+.glow-green {
+  background: linear-gradient(135deg, rgba(76,175,80,.15), rgba(76,175,80,.05));
+  border: 1px solid rgba(76,175,80,.3);
+  --glow-color: 0 0 15px rgba(76,175,80,.3), inset 0 0 15px rgba(76,175,80,.1);
+  --glow-color-intense: 0 0 25px rgba(76,175,80,.5), inset 0 0 25px rgba(76,175,80,.2);
+  animation: glowPulse 2.5s ease-in-out infinite;
+  color: #66bb6a;
+}
+.glow-white {
+  background: linear-gradient(135deg, rgba(255,255,255,.1), rgba(255,255,255,.03));
+  border: 1px solid rgba(255,255,255,.2);
+  --glow-color: 0 0 15px rgba(255,255,255,.2), inset 0 0 15px rgba(255,255,255,.05);
+  --glow-color-intense: 0 0 25px rgba(255,255,255,.35), inset 0 0 25px rgba(255,255,255,.1);
+  animation: glowPulse 3s ease-in-out infinite;
+  color: #fff;
+}
+.glow-yellow {
+  background: linear-gradient(135deg, rgba(255,193,7,.15), rgba(255,193,7,.05));
+  border: 1px solid rgba(255,193,7,.3);
+  --glow-color: 0 0 15px rgba(255,193,7,.3), inset 0 0 15px rgba(255,193,7,.1);
+  --glow-color-intense: 0 0 25px rgba(255,193,7,.5), inset 0 0 25px rgba(255,193,7,.2);
+  animation: glowPulse 2.5s ease-in-out infinite;
+  color: #ffd54f;
+}
+
+.glow-row-yellow { background: rgba(255,193,7,.08) !important; box-shadow: inset 3px 0 0 #ffc107; }
+.glow-row-blue { background: rgba(33,150,243,.08) !important; box-shadow: inset 3px 0 0 #2196f3; }
+.glow-row-green { background: rgba(76,175,80,.08) !important; box-shadow: inset 3px 0 0 #4caf50; animation: pulse 2s infinite; }
+.glow-row-red { background: rgba(244,67,54,.08) !important; box-shadow: inset 3px 0 0 #f44336; animation: pulse 1.5s infinite; }
 
 .map-legend {
   position: absolute; bottom: 16px; left: 16px;
@@ -1191,24 +1247,24 @@ tbody tr:hover { background: var(--bg-hover); }
 
     <!-- ═══ SECTOR 1: COBRANZA ═══ -->
     <div class="view" id="view-s1-cobranza">
-      <!-- ═══ MINI DASHBOARD ALERTAS 24h ═══ -->
-      <div id="alertasCuotas24h" class="card" style="margin-bottom:16px;border-left:4px solid var(--warning);display:none">
-        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px">
-          <span style="font-size:24px;animation:pulse 2s infinite">🔔</span>
-          <div style="flex:1">
-            <strong style="color:var(--warning);font-size:15px">⚠️ Cuotas próximas a vencer (24 horas)</strong>
-            <div id="alertasCuotasCount" style="font-size:13px;color:var(--text-secondary);margin-top:2px"></div>
-          </div>
+      <!-- ═══ DASHBOARD GLOW ═══ -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:24px">
+        <div class="glow-card glow-blue">
+          <div class="glow-number" id="statCuotasPendientes">0</div>
+          <div class="glow-label">📋 Pendientes (5 días)</div>
         </div>
-        <div id="alertasCuotasBody" style="padding:0 16px 14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px"></div>
-      </div>
-
-      <!-- ═══ STATS DE COBRANZA ═══ -->
-      <div id="cobranzaStats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px">
-        <div class="stat-card"><div class="stat-number" id="statCuotasPendientes">0</div><div class="stat-label">Pendientes</div></div>
-        <div class="stat-card"><div class="stat-number" id="statCuotasVencidas" style="color:var(--danger)">0</div><div class="stat-label">Vencidas/Mora</div></div>
-        <div class="stat-card"><div class="stat-number" id="statCuotasPagadas" style="color:var(--success)">0</div><div class="stat-label">Pagadas</div></div>
-        <div class="stat-card"><div class="stat-number" id="statMontoRecaudar">$0</div><div class="stat-label">Por Recaudar</div></div>
+        <div class="glow-card glow-red">
+          <div class="glow-number" id="statCuotasVencidas">0</div>
+          <div class="glow-label">⛔ Vencidas / Mora</div>
+        </div>
+        <div class="glow-card glow-green">
+          <div class="glow-number" id="statCuotasPagadas">0</div>
+          <div class="glow-label">✅ Pagadas</div>
+        </div>
+        <div class="glow-card glow-white">
+          <div class="glow-number" id="statMontoRecaudar">$0</div>
+          <div class="glow-label">💰 Por Recaudar</div>
+        </div>
       </div>
 
       <!-- ═══ TABS ═══ -->
@@ -2849,53 +2905,53 @@ async function cargarCobranzaTab(tab, btnEl) {
     const data = await rpc(fnMap[tab] || 'fn_cobranza_pendientes');
     let list = Array.isArray(data) ? data : [];
 
-    // ═══ Mini dashboard alertas 24h ═══
-    const alertPanel = document.getElementById('alertasCuotas24h');
-    const alertBody = document.getElementById('alertasCuotasBody');
-    const alertCount = document.getElementById('alertasCuotasCount');
+    // ═══ Dashboard stats ═══
     if (tab === 'pendientes') {
-      const cuotas24h = list.filter(c => {
+      const now = new Date();
+      const pend5d = list.filter(c => {
         const h = parseFloat(c.horas_para_vencer);
-        return h >= -2 && h <= 24; // include slightly overdue too
-      });
-      if (cuotas24h.length) {
-        alertCount.textContent = cuotas24h.length + ' cuota' + (cuotas24h.length > 1 ? 's' : '') + ' por vencer en las próximas 24 horas';
-        alertBody.innerHTML = cuotas24h.map(c => `
-          <div style="background:var(--bg-secondary);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-            <div>
-              <div style="font-weight:600;font-size:14px">${esc(c.cliente_nombre)}</div>
-              <div style="font-size:12px;color:var(--text-secondary)">${esc(c.moto_descripcion)} — ${esc(c.numero_contrato)} — Cuota ${c.numero_cuota}/${c.cantidad_cuotas}</div>
-            </div>
-            <div style="text-align:right">
-              <div style="font-weight:700;font-size:15px;color:var(--warning)">${fmtMoney(c.monto_total)}</div>
-              <div style="font-size:11px;color:var(--text-secondary)">Vence ${fmtDate(c.fecha_vencimiento)}</div>
-            </div>
-          </div>
-        `).join('');
-        alertPanel.style.display = 'block';
-      } else { alertPanel.style.display = 'none'; }
-    } else { alertPanel.style.display = 'none'; }
-
-    // ═══ Stats ═══
-    if (tab === 'pendientes') {
-      const pend = list.filter(c => c.cuota_estado === 'pendiente').length;
-      const venc = list.filter(c => c.cuota_estado === 'vencida' || c.cuota_estado === 'en_mora').length;
+        return h >= 0 && h <= 120; // 5 days = 120h
+      }).length;
+      const vencMora = list.filter(c => parseFloat(c.horas_para_vencer) < -24).length;
       const montoTotal = list.reduce((s, c) => s + parseFloat(c.monto_total || 0), 0);
-      document.getElementById('statCuotasPendientes').textContent = pend;
-      document.getElementById('statCuotasVencidas').textContent = venc;
+      document.getElementById('statCuotasPendientes').textContent = pend5d;
+      document.getElementById('statCuotasVencidas').textContent = vencMora;
       document.getElementById('statMontoRecaudar').textContent = fmtMoney(montoTotal);
+      // Fetch pagadas count async
+      rpc('fn_cobranza_acreditados').then(d => {
+        const arr = Array.isArray(d) ? d : [];
+        document.getElementById('statCuotasPagadas').textContent = arr.length;
+      }).catch(() => {});
     }
 
-    // ═══ Tabla ═══
+    // ═══ Tabla con colores glow por fila ═══
     if (list.length) {
       body.innerHTML = list.map(c => {
         const horas = parseFloat(c.horas_para_vencer || 999);
-        const esUrgente = horas >= 0 && horas <= 24;
-        const estaVencida = horas < 0;
-        const rowStyle = esUrgente ? 'background:rgba(255,193,7,0.08)' : (estaVencida ? 'background:rgba(244,67,54,0.06)' : '');
+        // Color logic:
+        // > 120h (5+ days): no glow (normal)
+        // 72-120h (3-5 days): blue glow
+        // 24-72h (1-3 days): yellow glow
+        // 0-24h: green glow pulsing
+        // < -24h: red glow pulsing (24h+ overdue)
+        let rowClass = '';
+        let indicator = '';
+        if (horas < -24) {
+          rowClass = 'glow-row-red';
+          indicator = '🔴';
+        } else if (horas >= 0 && horas <= 24) {
+          rowClass = 'glow-row-green';
+          indicator = '🟢';
+        } else if (horas > 24 && horas <= 72) {
+          rowClass = 'glow-row-yellow';
+          indicator = '🟡';
+        } else if (horas > 72 && horas <= 120) {
+          rowClass = 'glow-row-blue';
+          indicator = '🔵';
+        }
         const estadoKey = c.cuota_estado || 'pendiente';
-        return `<tr style="${rowStyle}">
-          <td>${esUrgente ? '⚠️ ' : (estaVencida ? '🔴 ' : '')}${fmtDate(c.fecha_vencimiento)}</td>
+        return `<tr class="${rowClass}">
+          <td>${indicator} ${fmtDate(c.fecha_vencimiento)}</td>
           <td><strong>${esc(c.numero_contrato)}</strong></td>
           <td>${esc(c.cliente_nombre)}</td>
           <td>${esc(c.cliente_cuit || c.cliente_dni || '—')}</td>
@@ -2905,8 +2961,8 @@ async function cargarCobranzaTab(tab, btnEl) {
           <td><span class="pill ${estadoCuotaColor[estadoKey] || 'blue'}">${estadoCuotaLabel[estadoKey] || estadoKey}</span></td>
           <td>
             <div class="user-actions-cell">
-              ${['pendiente','en_mora','vencida'].includes(estadoKey) ? `<button class="btn btn-sm btn-primary" onclick="acreditarCuota('${c.id}')" title="Acreditar pago">✅ Cobrar</button>` : ''}
-              ${['pendiente','en_mora','vencida'].includes(estadoKey) ? `<button class="btn btn-sm btn-danger" onclick="rechazarCuota('${c.id}')" title="Rechazar/Anular">❌</button>` : ''}
+              ${['pendiente','en_mora','vencida'].includes(estadoKey) ? `<button class="btn btn-sm btn-primary" onclick="acreditarCuota('${c.id}')" title="Cobrar">✅ Cobrar</button>` : ''}
+              ${['pendiente','en_mora','vencida'].includes(estadoKey) ? `<button class="btn btn-sm btn-danger" onclick="rechazarCuota('${c.id}')" title="Anular">❌</button>` : ''}
               ${estadoKey === 'pagada' ? `<span style="color:var(--success);font-size:13px">✓ Pagada${c.fecha_pago ? ' ' + fmtDate(c.fecha_pago) : ''}</span>` : ''}
             </div>
           </td>
