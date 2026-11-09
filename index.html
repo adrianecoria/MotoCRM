@@ -1689,6 +1689,7 @@ tbody tr:hover { background: var(--bg-hover); }
         <div class="form-group" style="grid-column:1/-1"><label class="form-label">Domicilio</label><input class="form-input" id="cDomicilio" placeholder="Calle y número"></div>
         <div class="form-group"><label class="form-label">Localidad</label><input class="form-input" id="cLocalidad" placeholder="Localidad"></div>
         <div class="form-group"><label class="form-label">Provincia</label><input class="form-input" id="cProvincia" value="Buenos Aires"></div>
+        <div class="form-group"><label class="form-label">Fecha Nacimiento</label><input class="form-input" id="cFechaNacimiento" type="date"></div>
       </div>
       <div style="margin-top:12px;font-size:13px;font-weight:600;color:var(--text-secondary)">Sectores</div>
       <div style="display:flex;gap:16px;margin-top:8px">
@@ -2187,7 +2188,7 @@ async function cargarClientes() {
 }
 
 function resetClienteForm() {
-  ['editClienteId','cDni','cCuit','cNombre','cApellido','cTelefono','cEmail','cDomicilio','cLocalidad','cNotas'].forEach(id => document.getElementById(id).value = '');
+  ['editClienteId','cDni','cCuit','cNombre','cApellido','cTelefono','cEmail','cDomicilio','cLocalidad','cNotas','cFechaNacimiento'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('cProvincia').value = 'Buenos Aires';
   document.getElementById('cDni').disabled = false;
   ['cSectorAlquiler','cSectorVentas','cSectorGps'].forEach(id => document.getElementById(id).checked = false);
@@ -2207,6 +2208,7 @@ function editarCliente(c) {
   document.getElementById('cDomicilio').value = c.domicilio || '';
   document.getElementById('cLocalidad').value = c.localidad || '';
   document.getElementById('cProvincia').value = c.provincia || 'Buenos Aires';
+  document.getElementById('cFechaNacimiento').value = c.fecha_nacimiento || '';
   document.getElementById('cSectorAlquiler').checked = c.sector_alquiler;
   document.getElementById('cSectorVentas').checked = c.sector_ventas;
   document.getElementById('cSectorGps').checked = c.sector_gps;
@@ -2235,13 +2237,14 @@ async function guardarCliente() {
       p_domicilio: document.getElementById('cDomicilio').value.trim() || null,
       p_localidad: document.getElementById('cLocalidad').value.trim() || null,
       p_provincia: document.getElementById('cProvincia').value.trim() || null,
+      p_fecha_nacimiento: document.getElementById('cFechaNacimiento').value || null,
       p_sector_alquiler: document.getElementById('cSectorAlquiler').checked,
       p_sector_ventas: document.getElementById('cSectorVentas').checked,
       p_sector_gps: document.getElementById('cSectorGps').checked,
       p_notas: document.getElementById('cNotas').value.trim() || null
     };
     let result;
-    if (id) { params.p_id = id; result = await rpc('fn_actualizar_cliente', params); }
+    if (id) { params.p_id = id; params.p_activo = true; result = await rpc('fn_actualizar_cliente', params); }
     else { result = await rpc('fn_crear_cliente', params); }
     if (result && result.ok) { closeModal('modalCliente'); showToast(id ? 'Cliente actualizado' : 'Cliente creado'); cargarClientes(); }
     else { errEl.textContent = (result && result.error) || 'Error al guardar'; errEl.style.display = 'block'; }
