@@ -449,6 +449,14 @@ tbody tr:hover { background: var(--bg-hover); }
   animation: glowPulse 3s ease-in-out infinite;
   color: #fff;
 }
+.glow-purple {
+  background: linear-gradient(135deg, rgba(156,39,176,.15), rgba(156,39,176,.05));
+  border: 1px solid rgba(156,39,176,.3);
+  --glow-color: 0 0 15px rgba(156,39,176,.3), inset 0 0 15px rgba(156,39,176,.1);
+  --glow-color-intense: 0 0 25px rgba(156,39,176,.5), inset 0 0 25px rgba(156,39,176,.2);
+  animation: glowPulse 2.5s ease-in-out infinite;
+  color: #ce93d8;
+}
 .glow-yellow {
   background: linear-gradient(135deg, rgba(255,193,7,.15), rgba(255,193,7,.05));
   border: 1px solid rgba(255,193,7,.3);
@@ -1263,7 +1271,11 @@ tbody tr:hover { background: var(--bg-hover); }
         </div>
         <div class="glow-card glow-white">
           <div class="glow-number" id="statMontoRecaudar">$0</div>
-          <div class="glow-label">💰 Por Recaudar</div>
+          <div class="glow-label">💰 Por Recaudar Semanal</div>
+        </div>
+        <div class="glow-card glow-purple">
+          <div class="glow-number" id="statRecaudacionTotal">$0</div>
+          <div class="glow-label">💎 Recaudación Total de Cuotas</div>
         </div>
       </div>
 
@@ -2917,10 +2929,12 @@ async function cargarCobranzaTab(tab, btnEl) {
       document.getElementById('statCuotasPendientes').textContent = pend5d;
       document.getElementById('statCuotasVencidas').textContent = vencMora;
       document.getElementById('statMontoRecaudar').textContent = fmtMoney(montoTotal);
-      // Fetch pagadas count async
+      // Fetch pagadas count + recaudación total async
       rpc('fn_cobranza_acreditados').then(d => {
         const arr = Array.isArray(d) ? d : [];
         document.getElementById('statCuotasPagadas').textContent = arr.length;
+        const totalRecaudado = arr.reduce((s, c) => s + parseFloat(c.monto_total || 0), 0);
+        document.getElementById('statRecaudacionTotal').textContent = fmtMoney(totalRecaudado);
       }).catch(() => {});
     }
 
