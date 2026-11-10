@@ -977,6 +977,10 @@ tbody tr:hover { background: var(--bg-hover); }
 
   <div class="sidebar-section">
     <div class="sidebar-section-title">Sector 3 — GPS</div>
+    <div class="nav-item" onclick="switchView('s3-inventario')">
+      <span class="sector-dot s3"></span>
+      <span class="nav-icon">📦</span> Inventario GPS
+    </div>
     <div class="nav-item" onclick="switchView('s3-mapa')">
       <span class="sector-dot s3"></span>
       <span class="nav-icon">🗺️</span> Mapa en Vivo
@@ -1201,6 +1205,7 @@ tbody tr:hover { background: var(--bg-hover); }
       <div class="tabs" style="margin-bottom:20px">
         <button class="tab-btn active" onclick="switchCrmTab('clientes')">Clientes</button>
         <button class="tab-btn" onclick="switchCrmTab('motos')">Motovehículos</button>
+        <button class="tab-btn" onclick="switchCrmTab('gps')">Dispositivos GPS</button>
       </div>
 
       <!-- ── CLIENTES ── -->
@@ -1232,6 +1237,23 @@ tbody tr:hover { background: var(--bg-hover); }
             <table>
               <thead><tr><th>Patente</th><th>Marca / Modelo</th><th>Cilindrada</th><th>Color</th><th>Estado</th><th>Sector</th><th>Acciones</th></tr></thead>
               <tbody id="motoTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── DISPOSITIVOS GPS ── -->
+      <div id="crmTab-gps" class="config-tab">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+          <div style="font-size:13px;color:var(--text-secondary)" id="gpsCount">Cargando...</div>
+          <button class="btn btn-primary" onclick="openModal('modalGps'); resetGpsForm();">+ Nuevo GPS</button>
+        </div>
+        <div id="gpsListLoading" style="text-align:center;padding:40px;color:var(--text-secondary)">Cargando dispositivos GPS...</div>
+        <div id="gpsTableWrap" class="card" style="padding:0;display:none">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Código</th><th>Marca / Modelo</th><th>IMEI</th><th>SIM</th><th>Operador</th><th>Estado</th><th>Precio Compra</th><th>Precio Venta</th><th>Acciones</th></tr></thead>
+              <tbody id="gpsTableBody"></tbody>
             </table>
           </div>
         </div>
@@ -1478,6 +1500,29 @@ tbody tr:hover { background: var(--bg-hover); }
     </div>
 
     <!-- ═══ SECTOR 3: MAPA EN VIVO ═══ -->
+    <!-- ═══ SECTOR 3: INVENTARIO GPS ═══ -->
+    <div class="view" id="view-s3-inventario">
+      <div class="stats-grid">
+        <div class="stat-card s3"><div class="stat-label">En Stock</div><div class="stat-value" id="gpsEnStock">—</div></div>
+        <div class="stat-card s3"><div class="stat-label">Asignados</div><div class="stat-value" id="gpsAsignados">—</div></div>
+        <div class="stat-card warn"><div class="stat-label">En Reparación</div><div class="stat-value" id="gpsReparacion">—</div></div>
+        <div class="stat-card s3"><div class="stat-label">Total Dispositivos</div><div class="stat-value" id="gpsTotal">—</div></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:20px 0 16px;flex-wrap:wrap;gap:12px">
+        <div style="font-size:13px;color:var(--text-secondary)" id="gpsInvCount">Cargando...</div>
+        <button class="btn btn-primary" onclick="openModal('modalGps'); resetGpsForm();">+ Nuevo GPS</button>
+      </div>
+      <div id="gpsInvLoading" style="text-align:center;padding:40px;color:var(--text-secondary)">Cargando inventario GPS...</div>
+      <div id="gpsInvTableWrap" class="card" style="padding:0;display:none">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Código</th><th>Marca / Modelo</th><th>IMEI</th><th>SIM</th><th>Operador</th><th>Estado</th><th>Precio Compra</th><th>Precio Venta</th><th>Fecha Compra</th><th>Acciones</th></tr></thead>
+            <tbody id="gpsInvTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <div class="view" id="view-s3-mapa">
       <div class="map-container">
         <div class="map-grid"></div>
@@ -2033,6 +2078,49 @@ tbody tr:hover { background: var(--bg-hover); }
   </div>
 </div>
 
+<!-- Modal GPS -->
+<div class="modal-overlay" id="modalGps" hidden>
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header"><h2 id="modalGpsTitle">Nuevo Dispositivo GPS</h2><button class="modal-close" onclick="closeModal('modalGps')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="gpsId">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group"><label class="form-label">Código *</label><input class="form-input" id="gpsCodigo" placeholder="GPS-0001"></div>
+        <div class="form-group"><label class="form-label">Marca *</label><input class="form-input" id="gpsMarca" placeholder="Sinotrack"></div>
+        <div class="form-group"><label class="form-label">Modelo *</label><input class="form-input" id="gpsModelo" placeholder="ST-901"></div>
+        <div class="form-group"><label class="form-label">IMEI</label><input class="form-input" id="gpsImei" placeholder="Número IMEI"></div>
+        <div class="form-group"><label class="form-label">Número SIM</label><input class="form-input" id="gpsNumSim" placeholder="Número de línea"></div>
+        <div class="form-group"><label class="form-label">Operador SIM</label>
+          <select class="form-input" id="gpsOperador">
+            <option value="">— Sin SIM —</option>
+            <option value="Personal">Personal</option>
+            <option value="Claro">Claro</option>
+            <option value="Movistar">Movistar</option>
+            <option value="Tuenti">Tuenti</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Estado</label>
+          <select class="form-input" id="gpsEstado">
+            <option value="en_stock">En Stock</option>
+            <option value="asignado">Asignado</option>
+            <option value="en_reparacion">En Reparación</option>
+            <option value="dado_de_baja">Dado de Baja</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Precio Compra</label><input class="form-input" type="number" id="gpsPrecioCompra" placeholder="0.00"></div>
+        <div class="form-group"><label class="form-label">Precio Venta</label><input class="form-input" type="number" id="gpsPrecioVenta" placeholder="0.00"></div>
+        <div class="form-group"><label class="form-label">Fecha Compra</label><input class="form-input" type="date" id="gpsFechaCompra"></div>
+      </div>
+      <div class="form-group" style="margin-top:12px"><label class="form-label">Notas</label><textarea class="form-input" id="gpsNotas" rows="2" placeholder="Observaciones..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalGps')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarGps()">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ TOAST NOTIFICATIONS ═══ -->
 <div class="toast" id="toast"></div>
 
@@ -2298,10 +2386,11 @@ function switchCrmTab(tab) {
   document.querySelectorAll('#view-crm .config-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('crmTab-' + tab)?.classList.add('active');
   document.querySelectorAll('#view-crm > .tabs .tab-btn').forEach((b, i) => {
-    b.classList.toggle('active', ['clientes','motos'][i] === tab);
+    b.classList.toggle('active', ['clientes','motos','gps'][i] === tab);
   });
   if (tab === 'clientes') cargarClientes();
   if (tab === 'motos') cargarMotos();
+  if (tab === 'gps') cargarGps();
 }
 
 async function cargarClientes() {
@@ -2593,6 +2682,172 @@ async function eliminarMoto(id) {
     if (r && r.ok) { showToast('Motovehículo dado de baja'); cargarMotos(); }
     else showToast((r && r.error) || 'Error', 'error');
   } catch (err) { showToast('Error de conexión', 'error'); }
+}
+
+// ═══ CRM: DISPOSITIVOS GPS ═══
+async function cargarGps() {
+  const loading = document.getElementById('gpsListLoading');
+  const wrap = document.getElementById('gpsTableWrap');
+  const tbody = document.getElementById('gpsTableBody');
+  loading.style.display = 'block'; wrap.style.display = 'none';
+  try {
+    const data = await rpc('fn_listar_gps');
+    tbody.innerHTML = '';
+    if (data && data.length) {
+      document.getElementById('gpsCount').textContent = data.length + ' dispositivos GPS';
+      const estadoMap = { en_stock: ['En Stock','green'], asignado: ['Asignado','blue'], en_reparacion: ['En Reparación','yellow'], dado_de_baja: ['Dado de Baja','red'] };
+      data.forEach(g => {
+        const [estadoLabel, estadoColor] = estadoMap[g.estado] || [g.estado, 'blue'];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${esc(g.codigo)}</strong></td>
+          <td>${esc(g.marca)} ${esc(g.modelo)}</td>
+          <td style="font-size:12px">${esc(g.imei || '—')}</td>
+          <td style="font-size:12px">${esc(g.numero_sim || '—')}</td>
+          <td>${esc(g.operador_sim || '—')}</td>
+          <td><span class="pill ${estadoColor}">${estadoLabel}</span></td>
+          <td style="font-variant-numeric:tabular-nums">${fmtMoney(g.precio_compra)}</td>
+          <td style="font-variant-numeric:tabular-nums">${fmtMoney(g.precio_venta)}</td>
+          <td>
+            <div style="display:flex;gap:6px">
+              <button class="btn" style="padding:4px 10px;font-size:12px" onclick='editarGps(${JSON.stringify(g)})'>✏️</button>
+              <button class="btn" style="padding:4px 10px;font-size:12px;color:var(--danger)" onclick="eliminarGps('${g.id}','${esc(g.codigo)}')">🗑️</button>
+            </div>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    } else {
+      document.getElementById('gpsCount').textContent = '0 dispositivos GPS';
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-secondary);padding:30px">No hay dispositivos GPS cargados</td></tr>';
+    }
+    loading.style.display = 'none'; wrap.style.display = 'block';
+  } catch (err) { loading.textContent = 'Error: ' + err.message; }
+}
+
+function resetGpsForm() {
+  document.getElementById('gpsId').value = '';
+  document.getElementById('gpsCodigo').value = '';
+  document.getElementById('gpsMarca').value = '';
+  document.getElementById('gpsModelo').value = '';
+  document.getElementById('gpsImei').value = '';
+  document.getElementById('gpsNumSim').value = '';
+  document.getElementById('gpsOperador').value = '';
+  document.getElementById('gpsEstado').value = 'en_stock';
+  document.getElementById('gpsPrecioCompra').value = '';
+  document.getElementById('gpsPrecioVenta').value = '';
+  document.getElementById('gpsFechaCompra').value = '';
+  document.getElementById('gpsNotas').value = '';
+  document.getElementById('modalGpsTitle').textContent = 'Nuevo Dispositivo GPS';
+}
+
+function editarGps(g) {
+  document.getElementById('gpsId').value = g.id;
+  document.getElementById('gpsCodigo').value = g.codigo || '';
+  document.getElementById('gpsMarca').value = g.marca || '';
+  document.getElementById('gpsModelo').value = g.modelo || '';
+  document.getElementById('gpsImei').value = g.imei || '';
+  document.getElementById('gpsNumSim').value = g.numero_sim || '';
+  document.getElementById('gpsOperador').value = g.operador_sim || '';
+  document.getElementById('gpsEstado').value = g.estado || 'en_stock';
+  document.getElementById('gpsPrecioCompra').value = g.precio_compra || '';
+  document.getElementById('gpsPrecioVenta').value = g.precio_venta || '';
+  document.getElementById('gpsFechaCompra').value = g.fecha_compra || '';
+  document.getElementById('gpsNotas').value = g.notas || '';
+  document.getElementById('modalGpsTitle').textContent = 'Editar GPS — ' + g.codigo;
+  openModal('modalGps');
+}
+
+async function guardarGps() {
+  const id = document.getElementById('gpsId').value;
+  const codigo = document.getElementById('gpsCodigo').value.trim();
+  const marca = document.getElementById('gpsMarca').value.trim();
+  const modelo = document.getElementById('gpsModelo').value.trim();
+  if (!codigo || !marca || !modelo) { showToast('Código, Marca y Modelo son obligatorios', 'error'); return; }
+  const params = {
+    p_codigo: codigo,
+    p_marca: marca,
+    p_modelo: modelo,
+    p_imei: document.getElementById('gpsImei').value.trim() || null,
+    p_numero_sim: document.getElementById('gpsNumSim').value.trim() || null,
+    p_operador_sim: document.getElementById('gpsOperador').value || null,
+    p_precio_compra: parseFloat(document.getElementById('gpsPrecioCompra').value) || 0,
+    p_precio_venta: parseFloat(document.getElementById('gpsPrecioVenta').value) || 0,
+    p_fecha_compra: document.getElementById('gpsFechaCompra').value || null,
+    p_notas: document.getElementById('gpsNotas').value.trim() || null
+  };
+  try {
+    let result;
+    if (id) {
+      params.p_id = id;
+      params.p_estado = document.getElementById('gpsEstado').value;
+      result = await rpc('fn_actualizar_gps', params);
+    } else {
+      result = await rpc('fn_crear_gps', params);
+    }
+    if (result && result.ok) {
+      showToast(id ? 'GPS actualizado' : 'GPS creado');
+      closeModal('modalGps');
+      cargarGps();
+    } else {
+      showToast((result && result.error) || 'Error al guardar', 'error');
+    }
+  } catch (err) { showToast('Error: ' + err.message, 'error'); }
+}
+
+async function eliminarGps(id, codigo) {
+  if (!confirm('¿Eliminar el dispositivo GPS ' + codigo + '?')) return;
+  try {
+    const result = await rpc('fn_eliminar_gps', { p_id: id });
+    if (result && result.ok) { showToast('GPS eliminado'); cargarGps(); }
+    else showToast((result && result.error) || 'Error', 'error');
+  } catch (err) { showToast('Error: ' + err.message, 'error'); }
+}
+
+async function cargarGpsInventario() {
+  const loading = document.getElementById('gpsInvLoading');
+  const wrap = document.getElementById('gpsInvTableWrap');
+  const tbody = document.getElementById('gpsInvTableBody');
+  loading.style.display = 'block'; wrap.style.display = 'none';
+  try {
+    const data = await rpc('fn_listar_gps');
+    tbody.innerHTML = '';
+    const enStock = (data||[]).filter(g => g.estado === 'en_stock').length;
+    const asignados = (data||[]).filter(g => g.estado === 'asignado').length;
+    const reparacion = (data||[]).filter(g => g.estado === 'en_reparacion').length;
+    document.getElementById('gpsEnStock').textContent = enStock;
+    document.getElementById('gpsAsignados').textContent = asignados;
+    document.getElementById('gpsReparacion').textContent = reparacion;
+    document.getElementById('gpsTotal').textContent = (data||[]).length;
+    if (data && data.length) {
+      document.getElementById('gpsInvCount').textContent = data.length + ' dispositivos GPS';
+      const estadoMap = { en_stock: ['En Stock','green'], asignado: ['Asignado','blue'], en_reparacion: ['En Reparación','yellow'], dado_de_baja: ['Dado de Baja','red'] };
+      data.forEach(g => {
+        const [estadoLabel, estadoColor] = estadoMap[g.estado] || [g.estado, 'blue'];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${esc(g.codigo)}</strong></td>
+          <td>${esc(g.marca)} ${esc(g.modelo)}</td>
+          <td style="font-size:12px">${esc(g.imei || '—')}</td>
+          <td style="font-size:12px">${esc(g.numero_sim || '—')}</td>
+          <td>${esc(g.operador_sim || '—')}</td>
+          <td><span class="pill ${estadoColor}">${estadoLabel}</span></td>
+          <td style="font-variant-numeric:tabular-nums">${fmtMoney(g.precio_compra)}</td>
+          <td style="font-variant-numeric:tabular-nums">${fmtMoney(g.precio_venta)}</td>
+          <td>${g.fecha_compra || '—'}</td>
+          <td>
+            <div style="display:flex;gap:6px">
+              <button class="btn" style="padding:4px 10px;font-size:12px" onclick='editarGps(${JSON.stringify(g)})'>✏️</button>
+              <button class="btn" style="padding:4px 10px;font-size:12px;color:var(--danger)" onclick="eliminarGps('${g.id}','${esc(g.codigo)}')">🗑️</button>
+            </div>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    } else {
+      document.getElementById('gpsInvCount').textContent = '0 dispositivos GPS';
+      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text-secondary);padding:30px">No hay dispositivos GPS cargados</td></tr>';
+    }
+    loading.style.display = 'none'; wrap.style.display = 'block';
+  } catch (err) { loading.textContent = 'Error: ' + err.message; }
 }
 
 // ═══ SECTOR 1: CONTRATOS ═══
@@ -2933,6 +3188,7 @@ const viewTitles = {
   's2-stock': 'Sector 2 — Inventario',
   's2-simulador': 'Sector 2 — Simulador de Crédito',
   's2-gestoria': 'Sector 2 — Gestoría y Trámites',
+  's3-inventario': 'Sector 3 — Inventario GPS',
   's3-mapa': 'Sector 3 — Mapa en Tiempo Real',
   's3-suscripciones': 'Sector 3 — Suscripciones GPS',
   's3-alertas': 'Sector 3 — Alertas y Pánico',
@@ -2964,7 +3220,8 @@ function switchView(id) {
     's2-stock': () => cargarInventarioAlquiler(),
     's2-gestoria': () => cargarTramites(),
     'contabilidad': cargarContabilidad,
-    'config': cargarUsuarios
+    'config': cargarUsuarios,
+    's3-inventario': cargarGpsInventario
   };
   if (loaders[id]) loaders[id]();
 }
